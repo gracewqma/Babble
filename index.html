@@ -100,23 +100,38 @@
       background: #fafafa;
     }
 
-    .tile {
-      width: var(--cell-size);
-      height: var(--cell-size);
-      border-radius: 8px;
-      border: 1px solid #b89f6b;
-      background: #f2d79a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: var(--tile-font);
-      font-weight: bold;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-    }
+.tile {
+  position: relative;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-radius: 8px;
+  border: 1px solid #b89f6b;
+  background: #f2d79a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.tile-letter {
+  font-size: var(--tile-font);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.tile-points {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: clamp(9px, 2.2vw, 12px);
+  font-weight: 700;
+  line-height: 1;
+  color: #5f4a1e;
+}
 
     .tile.selected {
       outline: 3px solid #4f8cff;
@@ -203,6 +218,11 @@
 
     let dictionary = new Set();
     let dictionaryLoaded = false;
+    const letterPoints = {
+  A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1,
+  J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3, Q: 10, R: 1,
+  S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
+};
 
     async function loadDictionary() {
       try {
@@ -312,33 +332,43 @@
       render();
     }
 
-    function createTileElement(tile) {
-      const tileEl = document.createElement("div");
-      tileEl.className = "tile";
-      if (selectedTileId === tile.id) {
-        tileEl.classList.add("selected");
-      }
+function createTileElement(tile) {
+  const tileEl = document.createElement("div");
+  tileEl.className = "tile";
+  if (selectedTileId === tile.id) {
+    tileEl.classList.add("selected");
+  }
 
-      tileEl.textContent = tile.letter;
-      tileEl.draggable = true;
+  tileEl.draggable = true;
 
-      tileEl.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectedTileId = selectedTileId === tile.id ? null : tile.id;
-        render();
-      });
+  const letterEl = document.createElement("div");
+  letterEl.className = "tile-letter";
+  letterEl.textContent = tile.letter;
 
-      tileEl.addEventListener("dragstart", () => {
-        draggedTileId = tile.id;
-        selectedTileId = tile.id;
-      });
+  const pointsEl = document.createElement("div");
+  pointsEl.className = "tile-points";
+  pointsEl.textContent = letterPoints[tile.letter] ?? "";
 
-      tileEl.addEventListener("dragend", () => {
-        draggedTileId = null;
-      });
+  tileEl.appendChild(letterEl);
+  tileEl.appendChild(pointsEl);
 
-      return tileEl;
-    }
+  tileEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectedTileId = selectedTileId === tile.id ? null : tile.id;
+    render();
+  });
+
+  tileEl.addEventListener("dragstart", () => {
+    draggedTileId = tile.id;
+    selectedTileId = tile.id;
+  });
+
+  tileEl.addEventListener("dragend", () => {
+    draggedTileId = null;
+  });
+
+  return tileEl;
+}
 
     function getBoardLetter(row, col) {
       const index = row * boardWidth + col;
