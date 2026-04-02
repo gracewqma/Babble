@@ -56,17 +56,28 @@
       margin: 0 auto;
     }
 
-    .cell {
-      width: var(--cell-size);
-      height: var(--cell-size);
-      border: 1px solid #cfcfcf;
-      border-radius: 6px;
-      background: #f8ecc8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+.cell {
+  position: relative;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  background: #f8ecc8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cell-modifier {
+  font-size: clamp(12px, 4vw, 22px);
+  font-weight: 800;
+  color: #111;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  font-family: "Comic Sans MS", "Marker Felt", cursive;
+}
 
     .cell.highlight {
       outline: 3px solid #7aa7ff;
@@ -222,6 +233,12 @@
   A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1,
   J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3, Q: 10, R: 1,
   S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
+};
+    const boardModifiers = {
+  "0-0": "3L",
+  "0-3": "2L",
+  "4-2": "2W",
+  "4-5": "3W"
 };
 
     async function loadDictionary() {
@@ -488,40 +505,49 @@ function createTileElement(tile) {
       boardEl.innerHTML = "";
       rackEl.innerHTML = "";
 
-      for (let i = 0; i < board.length; i++) {
-        const cell = document.createElement("div");
-        cell.className = "cell";
+for (let i = 0; i < board.length; i++) {
+  const row = Math.floor(i / boardWidth);
+  const col = i % boardWidth;
+  const modifier = boardModifiers[`${row}-${col}`];
 
-        cell.addEventListener("click", () => {
-          if (selectedTileId !== null) {
-            moveTile(selectedTileId, "board", i);
-          }
-        });
+  const cell = document.createElement("div");
+  cell.className = "cell";
 
-        cell.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          cell.classList.add("highlight");
-        });
+  cell.addEventListener("click", () => {
+    if (selectedTileId !== null) {
+      moveTile(selectedTileId, "board", i);
+    }
+  });
 
-        cell.addEventListener("dragleave", () => {
-          cell.classList.remove("highlight");
-        });
+  cell.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    cell.classList.add("highlight");
+  });
 
-        cell.addEventListener("drop", (e) => {
-          e.preventDefault();
-          cell.classList.remove("highlight");
-          if (draggedTileId !== null) {
-            moveTile(draggedTileId, "board", i);
-            draggedTileId = null;
-          }
-        });
+  cell.addEventListener("dragleave", () => {
+    cell.classList.remove("highlight");
+  });
 
-        if (board[i]) {
-          cell.appendChild(createTileElement(board[i]));
-        }
+  cell.addEventListener("drop", (e) => {
+    e.preventDefault();
+    cell.classList.remove("highlight");
+    if (draggedTileId !== null) {
+      moveTile(draggedTileId, "board", i);
+      draggedTileId = null;
+    }
+  });
 
-        boardEl.appendChild(cell);
-      }
+  if (board[i]) {
+    cell.appendChild(createTileElement(board[i]));
+  } else if (modifier) {
+    const modifierEl = document.createElement("div");
+    modifierEl.className = "cell-modifier";
+    modifierEl.textContent = modifier;
+    cell.appendChild(modifierEl);
+  }
+
+  boardEl.appendChild(cell);
+}
 
       for (let i = 0; i < rack.length; i++) {
         const slot = document.createElement("div");
