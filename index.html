@@ -26,35 +26,35 @@
     .page {
       padding: var(--page-padding);
     }
-    
+
     .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin: 0 0 20px;
-  flex-wrap: wrap;
-}
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 0 0 20px;
+      flex-wrap: wrap;
+    }
 
-h1 {
-  margin: 0;
-  font-size: clamp(28px, 6vw, 40px);
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 40px);
+    }
 
-.subtitle {
-  margin-top: 4px;
-  font-size: clamp(14px, 3vw, 18px);
-  color: #555;
-}
+    .subtitle {
+      margin-top: 4px;
+      font-size: clamp(14px, 3vw, 18px);
+      color: #555;
+    }
 
-.score-box {
-  background: white;
-  padding: 10px 14px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  font-size: clamp(16px, 3.6vw, 20px);
-  font-weight: 700;
-}
+    .score-box {
+      background: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      font-size: clamp(16px, 3.6vw, 20px);
+      font-weight: 700;
+    }
 
     .board-wrapper {
       display: flex;
@@ -80,67 +80,48 @@ h1 {
       margin: 0 auto;
     }
 
-.cell {
-  position: relative;
-  width: var(--cell-size);
-  height: var(--cell-size);
-  border: 1px solid #cfcfcf;
-  border-radius: 6px;
-  background: #f8ecc8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+    .cell {
+      position: relative;
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+      background: #f8ecc8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
 
-.cell-modifier {
-  font-size: clamp(12px, 4vw, 22px);
-  font-weight: 800;
-  color: #111;
-  line-height: 1;
-  user-select: none;
-  pointer-events: none;
-  font-family: "Comic Sans MS", "Marker Felt", cursive;
-}
+    .cell-modifier {
+      font-size: clamp(12px, 4vw, 22px);
+      font-weight: 800;
+      color: #111;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+      font-family: "Comic Sans MS", "Marker Felt", cursive;
+    }
 
     .cell.highlight {
       outline: 3px solid #7aa7ff;
     }
+
     .cell.mod-3w {
-  background: #cdb4ff;
-}
+      background: #cdb4ff;
+    }
 
-.cell.mod-2w {
-  background: #93c5fd;
-}
+    .cell.mod-2w {
+      background: #93c5fd;
+    }
 
-.cell.mod-3l {
-  background: #86efac;
-}
+    .cell.mod-3l {
+      background: #86efac;
+    }
 
-.cell.mod-2l {
-  background: #fde68a;
-}
-
-.tile.mod-3w {
-  background: #cdb4ff;
-  border-color: #9b7fe8;
-}
-
-.tile.mod-2w {
-  background: #93c5fd;
-  border-color: #5aa2f6;
-}
-
-.tile.mod-3l {
-  background: #86efac;
-  border-color: #59c97c;
-}
-
-.tile.mod-2l {
-  background: #fde68a;
-  border-color: #e5c454;
-}
+    .cell.mod-2l {
+      background: #fde68a;
+    }
 
     .rack {
       display: grid;
@@ -170,80 +151,80 @@ h1 {
       background: #fafafa;
     }
 
-.tile {
-  position: relative;
-  width: var(--cell-size);
-  height: var(--cell-size);
-  border-radius: 8px;
-  border: 1px solid #b89f6b;
-  background: #f2d79a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
+    .tile {
+      position: relative;
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border-radius: 8px;
+      border: 1px solid #b89f6b;
+      background: #f2d79a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
 
-.tile-letter {
-  font-size: var(--tile-font);
-  font-weight: bold;
-  line-height: 1;
-}
+    .tile.mod-3w {
+      background: #cdb4ff;
+      border-color: #9b7fe8;
+    }
 
-.tile-points {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: clamp(8px, 2vw, 11px);
-  font-weight: 700;
-  line-height: 1;
-  color: #5f4a1e;
-  white-space: nowrap;
-}
+    .tile.mod-2w {
+      background: #93c5fd;
+      border-color: #5aa2f6;
+    }
+
+    .tile.mod-3l {
+      background: #86efac;
+      border-color: #59c97c;
+    }
+
+    .tile.mod-2l {
+      background: #fde68a;
+      border-color: #e5c454;
+    }
+
+    .tile.locked {
+      cursor: default;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .tile-letter {
+      font-size: var(--tile-font);
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .tile-points {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: clamp(8px, 2vw, 11px);
+      font-weight: 700;
+      line-height: 1;
+      color: #5f4a1e;
+      white-space: nowrap;
+    }
+
     .tile-modifier {
-  position: absolute;
-  top: 4px;
-  left: 6px;
-  font-size: clamp(8px, 2vw, 11px);
-  font-weight: 700;
-  line-height: 1;
-  color: #5f4a1e;
-  white-space: nowrap;
-}
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: clamp(8px, 2vw, 11px);
+      font-weight: 700;
+      line-height: 1;
+      color: #5f4a1e;
+      white-space: nowrap;
+    }
 
     .tile.selected {
       outline: 3px solid #4f8cff;
       background: #e6f0ff;
     }
-    .confetti-container {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 9999;
-}
-
-.confetti-piece {
-  position: absolute;
-  top: -20px;
-  width: 10px;
-  height: 18px;
-  border-radius: 2px;
-  opacity: 0.9;
-  animation: confetti-fall linear forwards;
-}
-
-@keyframes confetti-fall {
-  from {
-    transform: translateY(0) rotate(0deg);
-  }
-  to {
-    transform: translateY(110vh) rotate(720deg);
-  }
-}
 
     .controls {
       display: flex;
@@ -269,6 +250,38 @@ h1 {
 
     .control-button:hover {
       background: #3c76db;
+    }
+
+    .control-button:disabled {
+      background: #9fb8f4;
+      cursor: default;
+    }
+
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      width: 10px;
+      height: 18px;
+      border-radius: 2px;
+      opacity: 0.9;
+      animation: confetti-fall linear forwards;
+    }
+
+    @keyframes confetti-fall {
+      from {
+        transform: translateY(0) rotate(0deg);
+      }
+      to {
+        transform: translateY(110vh) rotate(720deg);
+      }
     }
 
     @media (max-width: 600px) {
@@ -301,61 +314,128 @@ h1 {
 </head>
 <body>
   <div class="page">
-<div class="header">
-  <div>
-    <h1>Babble</h1>
-    <div class="subtitle">4/2/26: All the World's</div>
-  </div>
-  <div class="score-box">
-    Score: <span id="score">0</span>
-  </div>
-</div>
+    <div class="header">
+      <div>
+        <h1>Babble</h1>
+        <div class="subtitle">4/2/26: All the World's</div>
+      </div>
+      <div class="score-box">
+        Score: <span id="score">0</span>
+      </div>
+    </div>
+
     <div class="board-wrapper">
       <div id="board" class="board"></div>
       <div id="rack" class="rack"></div>
       <div class="controls">
         <button id="shuffleBtn" class="control-button">Shuffle</button>
-         <button id="rackBtn" class="control-button">Rack</button>
+        <button id="rackBtn" class="control-button">Rack</button>
+        <button id="hintBtn" class="control-button">Hint</button>
         <button id="checkBtn" class="control-button">Check</button>
       </div>
     </div>
   </div>
-<div id="confetti-container" class="confetti-container"></div>
+
+  <div id="confetti-container" class="confetti-container"></div>
+
   <script>
     const letters = "PLAYDRAMACTOSTGE".split("");
-        const boardModifiers = {
-  "0-3": "3L",
-  "4-1": "2L",
-  "0-2": "3W",
-  "4-5": "2W"
-};
-const startingHintTiles = {
-  "0-0": "P",
-  "4-4": "M",
-  "5-5": "G",
-  "6-5": "E"
-};
-    
+
     const boardWidth = 7;
     const boardHeight = 7;
     const boardSize = boardWidth * boardHeight;
 
-const boardEl = document.getElementById("board");
-const rackEl = document.getElementById("rack");
-const shuffleBtn = document.getElementById("shuffleBtn");
+    const boardModifiers = {
+      "0-2": "3W",
+      "0-3": "3L",
+      "4-1": "2L",
+      "4-5": "2W"
+    };
+
+    const solvedBoard = [
+      "PLAY···",
+      "··C····",
+      "··T··S·",
+      "··O··T·",
+      "·DRAMA·",
+      "·····G·",
+      "·····E·"
+    ];
+
+    const boardEl = document.getElementById("board");
+    const rackEl = document.getElementById("rack");
+    const shuffleBtn = document.getElementById("shuffleBtn");
     const rackBtn = document.getElementById("rackBtn");
-const checkBtn = document.getElementById("checkBtn");
-const scoreEl = document.getElementById("score");
-const confettiContainer = document.getElementById("confetti-container");
+    const hintBtn = document.getElementById("hintBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const scoreEl = document.getElementById("score");
+    const confettiContainer = document.getElementById("confetti-container");
 
     let dictionary = new Set();
     let dictionaryLoaded = false;
-    const letterPoints = {
-  A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1,
-  J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3, Q: 10, R: 1,
-  S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
-};
+    let confettiActive = false;
+    let selectedTileId = null;
+    let draggedTileId = null;
 
+    const letterPoints = {
+      A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1,
+      J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3, Q: 10, R: 1,
+      S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
+    };
+
+    const allTiles = letters.map((letter, index) => ({
+      id: index,
+      letter,
+      locked: false
+    }));
+
+    let board = Array(boardSize).fill(null);
+    let rack = shuffleArray([...allTiles]);
+
+    function getSolutionPlacements() {
+      const placements = [];
+
+      for (let row = 0; row < boardHeight; row++) {
+        for (let col = 0; col < boardWidth; col++) {
+          const letter = solvedBoard[row][col];
+          if (letter !== "·") {
+            placements.push({ row, col, letter });
+          }
+        }
+      }
+
+      return placements;
+    }
+
+    function getRevealPriority(entry) {
+      const base = letterPoints[entry.letter] ?? 0;
+      const modifier = getModifierAt(entry.row, entry.col);
+
+      let letterMultiplier = 1;
+      let wordMultiplier = 1;
+
+      if (modifier && modifier.endsWith("L")) {
+        letterMultiplier = Number(modifier[0]);
+      }
+      if (modifier && modifier.endsWith("W")) {
+        wordMultiplier = Number(modifier[0]);
+      }
+
+      return (base * letterMultiplier * wordMultiplier);
+    }
+
+    const hintQueue = getSolutionPlacements().sort((a, b) => {
+      const diff = getRevealPriority(b) - getRevealPriority(a);
+      if (diff !== 0) return diff;
+
+      const baseDiff = (letterPoints[b.letter] ?? 0) - (letterPoints[a.letter] ?? 0);
+      if (baseDiff !== 0) return baseDiff;
+
+      if (a.row !== b.row) return a.row - b.row;
+      return a.col - b.col;
+    });
+
+    let revealedHintCount = 0;
 
     async function loadDictionary() {
       try {
@@ -389,54 +469,73 @@ const confettiContainer = document.getElementById("confetti-container");
       return copy;
     }
 
-const allTiles = letters.map((letter, index) => ({
-  id: index,
-  letter
-}));
-
-let board = Array(boardSize).fill(null);
-
-const remainingTiles = [...allTiles];
-
-for (const [key, letter] of Object.entries(startingHintTiles)) {
-  const [row, col] = key.split("-").map(Number);
-  const boardIndex = row * boardWidth + col;
-
-  const tileIndex = remainingTiles.findIndex(tile => tile.letter === letter);
-  if (tileIndex !== -1) {
-    board[boardIndex] = remainingTiles.splice(tileIndex, 1)[0];
-  }
-}
-
-let rack = shuffleArray(remainingTiles);
-
-    let selectedTileId = null;
-    let draggedTileId = null;
-
     function findTileLocation(tileId) {
       for (let i = 0; i < rack.length; i++) {
         if (rack[i] && rack[i].id === tileId) {
           return { area: "rack", index: i };
         }
       }
+
       for (let i = 0; i < board.length; i++) {
         if (board[i] && board[i].id === tileId) {
           return { area: "board", index: i };
         }
       }
+
       return null;
     }
 
+    function findMovableTileByLetter(letter) {
+      for (let i = 0; i < rack.length; i++) {
+        if (rack[i] && rack[i].letter === letter && !rack[i].locked) {
+          return { area: "rack", index: i, tile: rack[i] };
+        }
+      }
+
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] && board[i].letter === letter && !board[i].locked) {
+          return { area: "board", index: i, tile: board[i] };
+        }
+      }
+
+      return null;
+    }
+
+    function getModifierAt(row, col) {
+      return boardModifiers[`${row}-${col}`] ?? null;
+    }
+
     function getModifierClass(modifier) {
-  if (!modifier) return "";
-  return `mod-${modifier.toLowerCase()}`;
-}
+      if (!modifier) return "";
+      return `mod-${modifier.toLowerCase()}`;
+    }
+
+    function getTileModifierText(boardIndex) {
+      if (boardIndex === null) return "";
+
+      const row = Math.floor(boardIndex / boardWidth);
+      const col = boardIndex % boardWidth;
+      return getModifierAt(row, col) ?? "";
+    }
+
+    function getTilePointsText(tile) {
+      return String(letterPoints[tile.letter] ?? 0);
+    }
+
+    function getBoardLetter(row, col) {
+      const index = row * boardWidth + col;
+      const tile = board[index];
+      return tile ? tile.letter : null;
+    }
 
     function moveTile(tileId, targetArea, targetIndex) {
       if (tileId === null) return;
 
       const source = findTileLocation(tileId);
       if (!source) return;
+
+      const sourceTile = source.area === "rack" ? rack[source.index] : board[source.index];
+      if (!sourceTile || sourceTile.locked) return;
 
       let movingTile;
       if (source.area === "rack") {
@@ -453,6 +552,14 @@ let rack = shuffleArray(remainingTiles);
         rack[targetIndex] = movingTile;
       } else {
         targetTile = board[targetIndex];
+        if (targetTile?.locked) {
+          if (source.area === "rack") {
+            rack[source.index] = movingTile;
+          } else {
+            board[source.index] = movingTile;
+          }
+          return;
+        }
         board[targetIndex] = movingTile;
       }
 
@@ -467,24 +574,31 @@ let rack = shuffleArray(remainingTiles);
       selectedTileId = null;
       render();
     }
-function rackAllTiles() {
-  const boardTiles = board.filter(tile => tile !== null);
 
-  for (let i = 0; i < board.length; i++) {
-    board[i] = null;
-  }
+    function rackAllTiles() {
+      const movableBoardTiles = [];
 
-  for (const tile of boardTiles) {
-    const emptyRackIndex = rack.findIndex(slot => slot === null);
-    if (emptyRackIndex !== -1) {
-      rack[emptyRackIndex] = tile;
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] && !board[i].locked) {
+          movableBoardTiles.push(board[i]);
+          board[i] = null;
+        }
+      }
+
+      for (const tile of movableBoardTiles) {
+        const emptyRackIndex = rack.findIndex(slot => slot === null);
+        if (emptyRackIndex !== -1) {
+          rack[emptyRackIndex] = tile;
+        } else {
+          rack.push(tile);
+        }
+      }
+
+      selectedTileId = null;
+      draggedTileId = null;
+      render();
     }
-  }
 
-  selectedTileId = null;
-  draggedTileId = null;
-  render();
-}
     function shuffleRack() {
       const rackTiles = rack.filter(tile => tile !== null);
       const shuffledTiles = shuffleArray(rackTiles);
@@ -498,137 +612,6 @@ function rackAllTiles() {
       selectedTileId = null;
       draggedTileId = null;
       render();
-    }
-
-    function getModifierAt(row, col) {
-  return boardModifiers[`${row}-${col}`] ?? null;
-}
-
-function getLetterModifierForPosition(row, col) {
-  const modifier = getModifierAt(row, col);
-  if (modifier && modifier.endsWith("L")) {
-    return modifier[0];
-  }
-  return null;
-}
-
-function getWordModifiersForPosition(row, col) {
-  const modifiers = [];
-
-  // horizontal word containing this tile
-  let startCol = col;
-  while (startCol > 0 && getBoardLetter(row, startCol - 1)) {
-    startCol--;
-  }
-
-  let endCol = col;
-  while (endCol < boardWidth - 1 && getBoardLetter(row, endCol + 1)) {
-    endCol++;
-  }
-
-  if (endCol - startCol + 1 >= 2) {
-    for (let c = startCol; c <= endCol; c++) {
-      const modifier = getModifierAt(row, c);
-      if (modifier && modifier.endsWith("W")) {
-        modifiers.push(modifier[0]);
-      }
-    }
-  }
-
-  // vertical word containing this tile
-  let startRow = row;
-  while (startRow > 0 && getBoardLetter(startRow - 1, col)) {
-    startRow--;
-  }
-
-  let endRow = row;
-  while (endRow < boardHeight - 1 && getBoardLetter(endRow + 1, col)) {
-    endRow++;
-  }
-
-  if (endRow - startRow + 1 >= 2) {
-    for (let r = startRow; r <= endRow; r++) {
-      const modifier = getModifierAt(r, col);
-      if (modifier && modifier.endsWith("W")) {
-        modifiers.push(modifier[0]);
-      }
-    }
-  }
-
-  return [...new Set(modifiers)].sort((a, b) => Number(b) - Number(a));
-}
-
-    function getTileModifierText(boardIndex) {
-  if (boardIndex === null) return "";
-
-  const row = Math.floor(boardIndex / boardWidth);
-  const col = boardIndex % boardWidth;
-  return getModifierAt(row, col) ?? "";
-}
-
-function getTilePointsText(tile, boardIndex = null) {
-  return String(letterPoints[tile.letter] ?? 0);
-}
-
-function createTileElement(tile, boardIndex = null) {
-  const tileEl = document.createElement("div");
-  tileEl.className = "tile";
-
-  if (boardIndex !== null) {
-  const row = Math.floor(boardIndex / boardWidth);
-  const col = boardIndex % boardWidth;
-  const modifier = getModifierAt(row, col);
-
-  if (modifier) {
-    tileEl.classList.add(getModifierClass(modifier));
-  }
-}
-  if (selectedTileId === tile.id) {
-    tileEl.classList.add("selected");
-  }
-
-  tileEl.draggable = true;
-
-const modifierEl = document.createElement("div");
-modifierEl.className = "tile-modifier";
-modifierEl.textContent = getTileModifierText(boardIndex);
-
-const letterEl = document.createElement("div");
-letterEl.className = "tile-letter";
-letterEl.textContent = tile.letter;
-
-const pointsEl = document.createElement("div");
-pointsEl.className = "tile-points";
-pointsEl.textContent = getTilePointsText(tile, boardIndex);
-
-if (modifierEl.textContent) {
-  tileEl.appendChild(modifierEl);
-}
-tileEl.appendChild(letterEl);
-tileEl.appendChild(pointsEl);
-
-  tileEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    selectedTileId = selectedTileId === tile.id ? null : tile.id;
-    render();
-  });
-
-  tileEl.addEventListener("dragstart", () => {
-    draggedTileId = tile.id;
-    selectedTileId = tile.id;
-  });
-
-  tileEl.addEventListener("dragend", () => {
-    draggedTileId = null;
-  });
-
-  return tileEl;
-}
-
-    function getBoardLetter(row, col) {
-      const index = row * boardWidth + col;
-      const tile = board[index];
-      return tile ? tile.letter : null;
     }
 
     function getWordsFromBoard() {
@@ -700,95 +683,143 @@ tileEl.appendChild(pointsEl);
 
       return foundWords;
     }
+
     function getLetterScoreAt(row, col) {
-  const letter = getBoardLetter(row, col);
-  if (!letter) return 0;
+      const letter = getBoardLetter(row, col);
+      if (!letter) return 0;
 
-  const base = letterPoints[letter] ?? 0;
-  const modifier = getModifierAt(row, col);
+      const base = letterPoints[letter] ?? 0;
+      const modifier = getModifierAt(row, col);
 
-  if (modifier && modifier.endsWith("L")) {
-    return base * Number(modifier[0]);
-  }
+      if (modifier && modifier.endsWith("L")) {
+        return base * Number(modifier[0]);
+      }
 
-  return base;
-}
-const solvedBoard = [
-  "··C····",
-  "··T··S·",
-  "··O··T·",
-  "·DRAMA·",
-  "·····G·",
-  "·····E·",
-  "·······"
-];
+      return base;
+    }
 
-let confettiActive = false;
+    function getWordScore(wordEntry) {
+      let total = 0;
+      let wordMultiplier = 1;
 
-function isSolvedBoard() {
-  for (let row = 0; row < boardHeight; row++) {
-    for (let col = 0; col < boardWidth; col++) {
-      const expected = solvedBoard[row][col];
-      const actual = getBoardLetter(row, col);
+      for (const [row, col] of wordEntry.positions) {
+        total += getLetterScoreAt(row, col);
 
-      if (expected === "·") {
-        if (actual !== null) return false;
-      } else {
-        if (actual !== expected) return false;
+        const modifier = getModifierAt(row, col);
+        if (modifier && modifier.endsWith("W")) {
+          wordMultiplier *= Number(modifier[0]);
+        }
+      }
+
+      return total * wordMultiplier;
+    }
+
+    function getTotalBoardScore() {
+      const words = getWordsFromBoard();
+      return words.reduce((sum, wordEntry) => sum + getWordScore(wordEntry), 0);
+    }
+
+    function isSolvedBoard() {
+      for (let row = 0; row < boardHeight; row++) {
+        for (let col = 0; col < boardWidth; col++) {
+          const expected = solvedBoard[row][col];
+          const actual = getBoardLetter(row, col);
+
+          if (expected === "·") {
+            if (actual !== null) return false;
+          } else {
+            if (actual !== expected) return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function launchConfetti() {
+      confettiContainer.innerHTML = "";
+
+      const colors = ["#f87171", "#fbbf24", "#34d399", "#60a5fa", "#c084fc", "#f472b6"];
+
+      for (let i = 0; i < 180; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.animationDuration = `${2.5 + Math.random() * 2}s`;
+        piece.style.animationDelay = `${Math.random() * 0.8}s`;
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        confettiContainer.appendChild(piece);
+      }
+
+      setTimeout(() => {
+        confettiContainer.innerHTML = "";
+        confettiActive = false;
+      }, 5200);
+    }
+
+    function maybeCelebrateSolution() {
+      if (isSolvedBoard() && !confettiActive) {
+        confettiActive = true;
+        launchConfetti();
       }
     }
-  }
-  return true;
-}
 
-function launchConfetti() {
-  confettiContainer.innerHTML = "";
+    function getNextUnrevealedHint() {
+      while (revealedHintCount < hintQueue.length) {
+        const nextHint = hintQueue[revealedHintCount];
+        const currentTile = board[nextHint.row * boardWidth + nextHint.col];
 
-  const colors = ["#f87171", "#fbbf24", "#34d399", "#60a5fa", "#c084fc", "#f472b6"];
+        if (currentTile && currentTile.letter === nextHint.letter && currentTile.locked) {
+          revealedHintCount++;
+          continue;
+        }
 
-  for (let i = 0; i < 180; i++) {
-    const piece = document.createElement("div");
-    piece.className = "confetti-piece";
-    piece.style.left = `${Math.random() * 100}vw`;
-    piece.style.animationDuration = `${2.5 + Math.random() * 2}s`;
-    piece.style.animationDelay = `${Math.random() * 0.8}s`;
-    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    confettiContainer.appendChild(piece);
-  }
+        return nextHint;
+      }
 
-  setTimeout(() => {
-    confettiContainer.innerHTML = "";
-    confettiActive = false;
-  }, 5200);
-}
-
-function maybeCelebrateSolution() {
-  if (isSolvedBoard() && !confettiActive) {
-    confettiActive = true;
-    launchConfetti();
-  }
-}
-function getWordScore(wordEntry) {
-  let total = 0;
-  let wordMultiplier = 1;
-
-  for (const [row, col] of wordEntry.positions) {
-    total += getLetterScoreAt(row, col);
-
-    const modifier = getModifierAt(row, col);
-    if (modifier && modifier.endsWith("W")) {
-      wordMultiplier *= Number(modifier[0]);
+      return null;
     }
-  }
 
-  return total * wordMultiplier;
-}
+    function revealNextHint() {
+      const nextHint = getNextUnrevealedHint();
+      if (!nextHint) {
+        render();
+        return;
+      }
 
-function getTotalBoardScore() {
-  const words = getWordsFromBoard();
-  return words.reduce((sum, wordEntry) => sum + getWordScore(wordEntry), 0);
-}
+      const targetIndex = nextHint.row * boardWidth + nextHint.col;
+      const currentTargetTile = board[targetIndex];
+
+      if (currentTargetTile?.locked && currentTargetTile.letter === nextHint.letter) {
+        revealedHintCount++;
+        render();
+        return;
+      }
+
+      const source = findMovableTileByLetter(nextHint.letter);
+      if (!source) {
+        render();
+        return;
+      }
+
+      let displacedTile = null;
+      if (currentTargetTile && !currentTargetTile.locked) {
+        displacedTile = currentTargetTile;
+      }
+
+      if (source.area === "rack") {
+        rack[source.index] = displacedTile;
+      } else {
+        board[source.index] = displacedTile;
+      }
+
+      source.tile.locked = true;
+      board[targetIndex] = source.tile;
+      selectedTileId = null;
+      draggedTileId = null;
+      revealedHintCount++;
+      render();
+    }
 
     function checkBoardWords() {
       if (!dictionaryLoaded) {
@@ -828,59 +859,120 @@ function getTotalBoardScore() {
       }
     }
 
+    function createTileElement(tile, boardIndex = null) {
+      const tileEl = document.createElement("div");
+      tileEl.className = "tile";
+
+      if (tile.locked) {
+        tileEl.classList.add("locked");
+      }
+
+      if (boardIndex !== null) {
+        const row = Math.floor(boardIndex / boardWidth);
+        const col = boardIndex % boardWidth;
+        const modifier = getModifierAt(row, col);
+
+        if (modifier) {
+          tileEl.classList.add(getModifierClass(modifier));
+        }
+      }
+
+      if (selectedTileId === tile.id) {
+        tileEl.classList.add("selected");
+      }
+
+      tileEl.draggable = !tile.locked;
+
+      const modifierEl = document.createElement("div");
+      modifierEl.className = "tile-modifier";
+      modifierEl.textContent = getTileModifierText(boardIndex);
+
+      const letterEl = document.createElement("div");
+      letterEl.className = "tile-letter";
+      letterEl.textContent = tile.letter;
+
+      const pointsEl = document.createElement("div");
+      pointsEl.className = "tile-points";
+      pointsEl.textContent = getTilePointsText(tile);
+
+      if (modifierEl.textContent) {
+        tileEl.appendChild(modifierEl);
+      }
+      tileEl.appendChild(letterEl);
+      tileEl.appendChild(pointsEl);
+
+      tileEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (tile.locked) return;
+        selectedTileId = selectedTileId === tile.id ? null : tile.id;
+        render();
+      });
+
+      tileEl.addEventListener("dragstart", () => {
+        if (tile.locked) return;
+        draggedTileId = tile.id;
+        selectedTileId = tile.id;
+      });
+
+      tileEl.addEventListener("dragend", () => {
+        draggedTileId = null;
+      });
+
+      return tileEl;
+    }
+
     function render() {
       boardEl.innerHTML = "";
       rackEl.innerHTML = "";
       scoreEl.textContent = getTotalBoardScore();
 
-for (let i = 0; i < board.length; i++) {
-  const row = Math.floor(i / boardWidth);
-  const col = i % boardWidth;
-  const modifier = boardModifiers[`${row}-${col}`];
-  
-const cell = document.createElement("div");
-cell.className = "cell";
+      for (let i = 0; i < board.length; i++) {
+        const row = Math.floor(i / boardWidth);
+        const col = i % boardWidth;
+        const modifier = getModifierAt(row, col);
 
-if (modifier) {
-  cell.classList.add(getModifierClass(modifier));
-}
+        const cell = document.createElement("div");
+        cell.className = "cell";
 
-  cell.addEventListener("click", () => {
-    if (selectedTileId !== null) {
-      moveTile(selectedTileId, "board", i);
-    }
-  });
+        if (modifier) {
+          cell.classList.add(getModifierClass(modifier));
+        }
 
-  cell.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    cell.classList.add("highlight");
-  });
+        cell.addEventListener("click", () => {
+          if (selectedTileId !== null) {
+            moveTile(selectedTileId, "board", i);
+          }
+        });
 
-  cell.addEventListener("dragleave", () => {
-    cell.classList.remove("highlight");
-  });
+        cell.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          cell.classList.add("highlight");
+        });
 
-  cell.addEventListener("drop", (e) => {
-    e.preventDefault();
-    cell.classList.remove("highlight");
-    if (draggedTileId !== null) {
-      moveTile(draggedTileId, "board", i);
-      draggedTileId = null;
-    }
-  });
+        cell.addEventListener("dragleave", () => {
+          cell.classList.remove("highlight");
+        });
 
-  if (board[i]) {
-    cell.appendChild(createTileElement(board[i], i));
-  } else if (modifier) {
-    const modifierEl = document.createElement("div");
-    modifierEl.className = "cell-modifier";
-    modifierEl.textContent = modifier;
-    cell.appendChild(modifierEl);
-  }
+        cell.addEventListener("drop", (e) => {
+          e.preventDefault();
+          cell.classList.remove("highlight");
+          if (draggedTileId !== null) {
+            moveTile(draggedTileId, "board", i);
+            draggedTileId = null;
+          }
+        });
 
-  boardEl.appendChild(cell);
-  maybeCelebrateSolution();
-}
+        if (board[i]) {
+          cell.appendChild(createTileElement(board[i], i));
+        } else if (modifier) {
+          const modifierEl = document.createElement("div");
+          modifierEl.className = "cell-modifier";
+          modifierEl.textContent = modifier;
+          cell.appendChild(modifierEl);
+        }
+
+        boardEl.appendChild(cell);
+      }
 
       for (let i = 0; i < rack.length; i++) {
         const slot = document.createElement("div");
@@ -905,17 +997,21 @@ if (modifier) {
         });
 
         if (rack[i]) {
-         slot.appendChild(createTileElement(rack[i], null));
+          slot.appendChild(createTileElement(rack[i], null));
         } else {
           slot.classList.add("empty");
         }
 
         rackEl.appendChild(slot);
       }
+
+      hintBtn.disabled = revealedHintCount >= hintQueue.length;
+      maybeCelebrateSolution();
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
     rackBtn.addEventListener("click", rackAllTiles);
+    hintBtn.addEventListener("click", revealNextHint);
     checkBtn.addEventListener("click", checkBoardWords);
 
     loadDictionary();
