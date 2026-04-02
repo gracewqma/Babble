@@ -42,7 +42,12 @@
   gap: 10px;
   align-items: flex-start;
 }
-
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
 .top-controls {
   display: flex;
   align-items: center;
@@ -391,18 +396,17 @@
   <div class="header-left">
     <h1>Babble</h1>
     <div class="subtitle">4/2/26: All the World's</div>
-
-    <div class="top-controls">
-      <button id="hintBtn" class="control-button top-button">Hint (0)</button>
-      <label class="shadow-toggle">
-        <input id="shadowToggle" type="checkbox" />
-        <span>Shadow</span>
-      </label>
-    </div>
   </div>
 
-  <div class="score-box">
-    Score: <span id="score">0</span>
+  <div class="header-right">
+    <label class="shadow-toggle">
+      <input id="shadowToggle" type="checkbox" />
+      <span>Shadow</span>
+    </label>
+
+    <div class="score-box">
+      Score: <span id="score">0</span>
+    </div>
   </div>
 </div>
 
