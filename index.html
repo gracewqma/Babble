@@ -53,6 +53,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      margin: 0 auto;
     }
 
     .cell {
@@ -73,24 +74,25 @@
 
     .rack {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(var(--cell-size), 1fr));
+      grid-template-columns: repeat(auto-fit, var(--cell-size));
       gap: var(--rack-gap);
+      justify-content: center;
       padding: clamp(10px, 2.5vw, 16px);
       background: white;
       border-radius: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      min-height: calc(var(--cell-size) + 16px);
+      min-height: calc(var(--cell-size) + 32px);
       width: 100%;
     }
 
     .rack-slot {
-      width: 100%;
-      aspect-ratio: 1 / 1;
+      width: var(--cell-size);
+      height: var(--cell-size);
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 0;
+      flex-shrink: 0;
     }
 
     .rack-slot.empty {
@@ -99,8 +101,8 @@
     }
 
     .tile {
-      width: 100%;
-      height: 100%;
+      width: var(--cell-size);
+      height: var(--cell-size);
       border-radius: 8px;
       border: 1px solid #b89f6b;
       background: #f2d79a;
@@ -160,10 +162,6 @@
         gap: 14px;
       }
 
-      .board {
-        margin: 0 auto;
-      }
-
       .controls {
         flex-direction: column;
         align-items: stretch;
@@ -171,6 +169,10 @@
 
       .control-button {
         width: 100%;
+      }
+
+      .rack {
+        grid-template-columns: repeat(auto-fit, var(--cell-size));
       }
     }
   </style>
@@ -190,12 +192,40 @@
 
   <script>
     const letters = "PLAYDRAMACTOSTGE".split("");
-    const boardSize = 49;
+    const boardWidth = 7;
+    const boardHeight = 7;
+    const boardSize = boardWidth * boardHeight;
 
     const boardEl = document.getElementById("board");
     const rackEl = document.getElementById("rack");
     const shuffleBtn = document.getElementById("shuffleBtn");
     const checkBtn = document.getElementById("checkBtn");
+
+    let dictionary = new Set();
+    let dictionaryLoaded = false;
+
+    async function loadDictionary() {
+      try {
+        const response = await fetch("./dictionary.txt");
+        if (!response.ok) {
+          throw new Error(`Failed to load dictionary: ${response.status}`);
+        }
+
+        const text = await response.text();
+        dictionary = new Set(
+          text
+            .split(/\r?\n/)
+            .map(word => word.trim().toUpperCase())
+            .filter(Boolean)
+        );
+
+        dictionaryLoaded = true;
+        console.log(`Loaded ${dictionary.size} dictionary words.`);
+      } catch (error) {
+        console.error(error);
+        alert("Could not load dictionary.txt. Make sure you're running this from a local server.");
+      }
+    }
 
     function shuffleArray(array) {
       const copy = [...array];
@@ -310,6 +340,120 @@
       return tileEl;
     }
 
+    function getBoardLetter(row, col) {
+      const index = row * boardWidth + col;
+      const tile = board[index];
+      return tile ? tile.letter : null;
+    }
+
+    function getWordsFromBoard() {
+      const foundWords = [];
+
+      for (let row = 0; row < boardHeight; row++) {
+        let currentWord = "";
+        let positions = [];
+
+        for (let col = 0; col < boardWidth; col++) {
+          const letter = getBoardLetter(row, col);
+
+          if (letter) {
+            currentWord += letter;
+            positions.push([row, col]);
+          } else {
+            if (currentWord.length >= 2) {
+              foundWords.push({
+                word: currentWord,
+                direction: "horizontal",
+                positions
+              });
+            }
+            currentWord = "";
+            positions = [];
+          }
+        }
+
+        if (currentWord.length >= 2) {
+          foundWords.push({
+            word: currentWord,
+            direction: "horizontal",
+            positions
+          });
+        }
+      }
+
+      for (let col = 0; col < boardWidth; col++) {
+        let currentWord = "";
+        let positions = [];
+
+        for (let row = 0; row < boardHeight; row++) {
+          const letter = getBoardLetter(row, col);
+
+          if (letter) {
+            currentWord += letter;
+            positions.push([row, col]);
+          } else {
+            if (currentWord.length >= 2) {
+              foundWords.push({
+                word: currentWord,
+                direction: "vertical",
+                positions
+              });
+            }
+            currentWord = "";
+            positions = [];
+          }
+        }
+
+        if (currentWord.length >= 2) {
+          foundWords.push({
+            word: currentWord,
+            direction: "vertical",
+            positions
+          });
+        }
+      }
+
+      return foundWords;
+    }
+
+    function checkBoardWords() {
+      if (!dictionaryLoaded) {
+        alert("Dictionary is still loading.");
+        return;
+      }
+
+      const wordsOnBoard = getWordsFromBoard();
+
+      if (wordsOnBoard.length === 0) {
+        alert("No words on the board yet.");
+        return;
+      }
+
+      const invalidWords = wordsOnBoard.filter(entry => !dictionary.has(entry.word.toUpperCase()));
+
+      if (invalidWords.length === 0) {
+        const wordList = wordsOnBoard.map(entry => entry.word).join(", ");
+        alert(`All words are valid!\n\nWords found: ${wordList}`);
+      } else {
+        const invalidList = invalidWords
+          .map(entry => `${entry.word} (${entry.direction})`)
+          .join("\n");
+
+        const validList = wordsOnBoard
+          .filter(entry => dictionary.has(entry.word.toUpperCase()))
+          .map(entry => entry.word)
+          .join(", ");
+
+        let message = "Some words are invalid.\n\n";
+        if (validList) {
+          message += `Valid: ${validList}\n\n`;
+        }
+        message += `Invalid:\n${invalidList}`;
+
+        alert(message);
+      }
+    }
+
     function render() {
       boardEl.innerHTML = "";
       rackEl.innerHTML = "";
@@ -382,11 +526,9 @@
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
+    checkBtn.addEventListener("click", checkBoardWords);
 
-    checkBtn.addEventListener("click", () => {
-      // Intentionally does nothing for now
-    });
-
+    loadDictionary();
     render();
   </script>
 </body>
