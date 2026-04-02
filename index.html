@@ -41,30 +41,6 @@
       max-width: 100%;
     }
 
-    .controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      width: 100%;
-    }
-
-    .shuffle-button {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 10px;
-      background: #4f8cff;
-      color: white;
-      font-size: clamp(14px, 3.8vw, 16px);
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-      touch-action: manipulation;
-    }
-
-    .shuffle-button:hover {
-      background: #3c76db;
-    }
-
     .board {
       display: grid;
       grid-template-columns: repeat(7, var(--cell-size));
@@ -145,6 +121,32 @@
       background: #e6f0ff;
     }
 
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .control-button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      background: #4f8cff;
+      color: white;
+      font-size: clamp(14px, 3.8vw, 16px);
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      touch-action: manipulation;
+      min-width: 120px;
+    }
+
+    .control-button:hover {
+      background: #3c76db;
+    }
+
     @media (max-width: 600px) {
       :root {
         --cell-size: min(11.5vw, 48px);
@@ -158,17 +160,17 @@
         gap: 14px;
       }
 
-      .controls {
-        justify-content: center;
-      }
-
-      .shuffle-button {
-        width: 100%;
-        max-width: 220px;
-      }
-
       .board {
         margin: 0 auto;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .control-button {
+        width: 100%;
       }
     }
   </style>
@@ -177,11 +179,12 @@
   <div class="page">
     <h1>Babble</h1>
     <div class="board-wrapper">
-      <div class="controls">
-        <button id="shuffleBtn" class="shuffle-button">Shuffle</button>
-      </div>
       <div id="board" class="board"></div>
       <div id="rack" class="rack"></div>
+      <div class="controls">
+        <button id="shuffleBtn" class="control-button">Shuffle</button>
+        <button id="checkBtn" class="control-button">Check</button>
+      </div>
     </div>
   </div>
 
@@ -192,6 +195,7 @@
     const boardEl = document.getElementById("board");
     const rackEl = document.getElementById("rack");
     const shuffleBtn = document.getElementById("shuffleBtn");
+    const checkBtn = document.getElementById("checkBtn");
 
     function shuffleArray(array) {
       const copy = [...array];
@@ -378,6 +382,10 @@
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
+
+    checkBtn.addEventListener("click", () => {
+      // Intentionally does nothing for now
+    });
 
     render();
   </script>
