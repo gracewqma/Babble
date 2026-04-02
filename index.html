@@ -289,6 +289,7 @@ h1 {
       <div id="rack" class="rack"></div>
       <div class="controls">
         <button id="shuffleBtn" class="control-button">Shuffle</button>
+         <button id="rackBtn" class="control-button">Rack</button>
         <button id="checkBtn" class="control-button">Check</button>
       </div>
     </div>
@@ -303,6 +304,7 @@ h1 {
 const boardEl = document.getElementById("board");
 const rackEl = document.getElementById("rack");
 const shuffleBtn = document.getElementById("shuffleBtn");
+    const rackBtn = document.getElementById("rackBtn");
 const checkBtn = document.getElementById("checkBtn");
 const scoreEl = document.getElementById("score");
 
@@ -417,7 +419,24 @@ const scoreEl = document.getElementById("score");
       selectedTileId = null;
       render();
     }
+function rackAllTiles() {
+  const boardTiles = board.filter(tile => tile !== null);
 
+  for (let i = 0; i < board.length; i++) {
+    board[i] = null;
+  }
+
+  for (const tile of boardTiles) {
+    const emptyRackIndex = rack.findIndex(slot => slot === null);
+    if (emptyRackIndex !== -1) {
+      rack[emptyRackIndex] = tile;
+    }
+  }
+
+  selectedTileId = null;
+  draggedTileId = null;
+  render();
+}
     function shuffleRack() {
       const rackTiles = rack.filter(tile => tile !== null);
       const shuffledTiles = shuffleArray(rackTiles);
@@ -792,6 +811,7 @@ if (modifier) {
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
+    rackBtn.addEventListener("click", rackAllTiles);
     checkBtn.addEventListener("click", checkBoardWords);
 
     loadDictionary();
