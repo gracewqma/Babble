@@ -106,6 +106,41 @@ h1 {
     .cell.highlight {
       outline: 3px solid #7aa7ff;
     }
+    .cell.mod-3w {
+  background: #cdb4ff;
+}
+
+.cell.mod-2w {
+  background: #93c5fd;
+}
+
+.cell.mod-3l {
+  background: #86efac;
+}
+
+.cell.mod-2l {
+  background: #fde68a;
+}
+
+.tile.mod-3w {
+  background: #cdb4ff;
+  border-color: #9b7fe8;
+}
+
+.tile.mod-2w {
+  background: #93c5fd;
+  border-color: #5aa2f6;
+}
+
+.tile.mod-3l {
+  background: #86efac;
+  border-color: #59c97c;
+}
+
+.tile.mod-2l {
+  background: #fde68a;
+  border-color: #e5c454;
+}
 
     .rack {
       display: grid;
@@ -342,6 +377,11 @@ const scoreEl = document.getElementById("score");
       return null;
     }
 
+    function getModifierClass(modifier) {
+  if (!modifier) return "";
+  return `mod-${modifier.toLowerCase()}`;
+}
+
     function moveTile(tileId, targetArea, targetIndex) {
       if (tileId === null) return;
 
@@ -466,6 +506,16 @@ function getTilePointsText(tile, boardIndex = null) {
 function createTileElement(tile, boardIndex = null) {
   const tileEl = document.createElement("div");
   tileEl.className = "tile";
+
+  if (boardIndex !== null) {
+  const row = Math.floor(boardIndex / boardWidth);
+  const col = boardIndex % boardWidth;
+  const modifier = getModifierAt(row, col);
+
+  if (modifier) {
+    tileEl.classList.add(getModifierClass(modifier));
+  }
+}
   if (selectedTileId === tile.id) {
     tileEl.classList.add("selected");
   }
@@ -665,9 +715,13 @@ for (let i = 0; i < board.length; i++) {
   const row = Math.floor(i / boardWidth);
   const col = i % boardWidth;
   const modifier = boardModifiers[`${row}-${col}`];
+  
+const cell = document.createElement("div");
+cell.className = "cell";
 
-  const cell = document.createElement("div");
-  cell.className = "cell";
+if (modifier) {
+  cell.classList.add(getModifierClass(modifier));
+}
 
   cell.addEventListener("click", () => {
     if (selectedTileId !== null) {
