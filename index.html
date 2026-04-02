@@ -168,6 +168,16 @@ h1 {
   color: #5f4a1e;
   white-space: nowrap;
 }
+    .tile-modifier {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: clamp(8px, 2vw, 11px);
+  font-weight: 700;
+  line-height: 1;
+  color: #5f4a1e;
+  white-space: nowrap;
+}
 
     .tile.selected {
       outline: 3px solid #4f8cff;
@@ -441,31 +451,16 @@ function getWordModifiersForPosition(row, col) {
   return [...new Set(modifiers)].sort((a, b) => Number(b) - Number(a));
 }
 
-function getTilePointsText(tile, boardIndex = null) {
-  const basePoints = letterPoints[tile.letter] ?? 0;
-
-  if (boardIndex === null) {
-    return String(basePoints);
-  }
+    function getTileModifierText(boardIndex) {
+  if (boardIndex === null) return "";
 
   const row = Math.floor(boardIndex / boardWidth);
   const col = boardIndex % boardWidth;
+  return getModifierAt(row, col) ?? "";
+}
 
-  const parts = [];
-
-  const wordModifiers = getWordModifiersForPosition(row, col);
-  for (const modifier of wordModifiers) {
-    parts.push(`${modifier} x`);
-  }
-
-  const letterModifier = getLetterModifierForPosition(row, col);
-  if (letterModifier) {
-    parts.push(`${letterModifier} x`);
-  }
-
-  parts.push(String(basePoints));
-
-  return parts.join(" ");
+function getTilePointsText(tile, boardIndex = null) {
+  return String(letterPoints[tile.letter] ?? 0);
 }
 
 function createTileElement(tile, boardIndex = null) {
@@ -477,16 +472,23 @@ function createTileElement(tile, boardIndex = null) {
 
   tileEl.draggable = true;
 
-  const letterEl = document.createElement("div");
-  letterEl.className = "tile-letter";
-  letterEl.textContent = tile.letter;
+const modifierEl = document.createElement("div");
+modifierEl.className = "tile-modifier";
+modifierEl.textContent = getTileModifierText(boardIndex);
 
-  const pointsEl = document.createElement("div");
-  pointsEl.className = "tile-points";
-  pointsEl.textContent = getTilePointsText(tile, boardIndex);
+const letterEl = document.createElement("div");
+letterEl.className = "tile-letter";
+letterEl.textContent = tile.letter;
 
-  tileEl.appendChild(letterEl);
-  tileEl.appendChild(pointsEl);
+const pointsEl = document.createElement("div");
+pointsEl.className = "tile-points";
+pointsEl.textContent = getTilePointsText(tile, boardIndex);
+
+if (modifierEl.textContent) {
+  tileEl.appendChild(modifierEl);
+}
+tileEl.appendChild(letterEl);
+tileEl.appendChild(pointsEl);
 
   tileEl.addEventListener("click", (e) => {
     e.stopPropagation();
