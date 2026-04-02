@@ -1,209 +1,289 @@
-import { useMemo, useState } from "react";
-
-export default function BabbleBoard() {
-  const letters = useMemo(() => "PLAYDRAMACTOSTGE".split(""), []);
-  const tiles = useMemo(
-    () => letters.map((letter, index) => ({ id: `tile-${index}`, letter })),
-    [letters]
-  );
-
-  const [board, setBoard] = useState(Array(49).fill(null));
-  const [rack, setRack] = useState(tiles.map((tile) => tile.id));
-  const [selectedTileId, setSelectedTileId] = useState(null);
-  const [draggedTileId, setDraggedTileId] = useState(null);
-  const [dragOverCell, setDragOverCell] = useState(null);
-  const [dragOverRack, setDragOverRack] = useState(null);
-
-  const tileMap = useMemo(
-    () => Object.fromEntries(tiles.map((tile) => [tile.id, tile])),
-    [tiles]
-  );
-
-  function findTileLocation(tileId, boardState = board, rackState = rack) {
-    const boardIndex = boardState.findIndex((id) => id === tileId);
-    if (boardIndex !== -1) {
-      return { area: "board", index: boardIndex };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Babble</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
     }
 
-    const rackIndex = rackState.findIndex((id) => id === tileId);
-    if (rackIndex !== -1) {
-      return { area: "rack", index: rackIndex };
+    .page {
+      padding: 32px;
     }
 
-    return null;
-  }
+    h1 {
+      margin-bottom: 24px;
+    }
 
-  function moveTile(tileId, targetArea, targetIndex) {
-    if (!tileId) return;
+    .board-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: flex-start;
+    }
 
-    setBoard((currentBoard) => {
-      const nextBoard = [...currentBoard];
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, 56px);
+      gap: 4px;
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      width: fit-content;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
 
-      setRack((currentRack) => {
-        const nextRack = [...currentRack];
-        const source = findTileLocation(tileId, currentBoard, currentRack);
-        if (!source) return currentRack;
+    .cell {
+      width: 56px;
+      height: 56px;
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+      background: #f8ecc8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        const targetOccupiedId =
-          targetArea === "board" ? nextBoard[targetIndex] : nextRack[targetIndex];
+    .cell.highlight {
+      outline: 3px solid #7aa7ff;
+    }
 
-        if (source.area === targetArea && source.index === targetIndex) {
-          return currentRack;
+    .rack {
+      display: flex;
+      gap: 8px;
+      padding: 16px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      min-height: 72px;
+      flex-wrap: wrap;
+    }
+
+    .rack-slot {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rack-slot.empty {
+      border: 1px dashed #cfcfcf;
+      background: #fafafa;
+    }
+
+    .tile {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      border: 1px solid #b89f6b;
+      background: #f2d79a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .tile.selected {
+      outline: 3px solid #4f8cff;
+      background: #e6f0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Babble</h1>
+    <div class="board-wrapper">
+      <div id="board" class="board"></div>
+      <div id="rack" class="rack"></div>
+    </div>
+  </div>
+
+  <script>
+    const letters = "PLAYDRAMACTOSTGE".split("");
+    const boardSize = 49;
+
+    const boardEl = document.getElementById("board");
+    const rackEl = document.getElementById("rack");
+
+    let board = Array(boardSize).fill(null);
+    let rack = letters.map((letter, index) => ({
+      id: index,
+      letter
+    }));
+
+    let selectedTileId = null;
+    let draggedTileId = null;
+
+    function getTileById(id) {
+      for (const tile of rack) {
+        if (tile && tile.id === id) return tile;
+      }
+      for (const tile of board) {
+        if (tile && tile.id === id) return tile;
+      }
+      return null;
+    }
+
+    function findTileLocation(tileId) {
+      for (let i = 0; i < rack.length; i++) {
+        if (rack[i] && rack[i].id === tileId) {
+          return { area: "rack", index: i };
         }
+      }
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] && board[i].id === tileId) {
+          return { area: "board", index: i };
+        }
+      }
+      return null;
+    }
 
-        if (source.area === "board") {
-          nextBoard[source.index] = null;
+    function moveTile(tileId, targetArea, targetIndex) {
+      if (tileId === null) return;
+
+      const source = findTileLocation(tileId);
+      if (!source) return;
+
+      let movingTile;
+      if (source.area === "rack") {
+        movingTile = rack[source.index];
+        rack[source.index] = null;
+      } else {
+        movingTile = board[source.index];
+        board[source.index] = null;
+      }
+
+      let targetTile = null;
+      if (targetArea === "rack") {
+        targetTile = rack[targetIndex];
+        rack[targetIndex] = movingTile;
+      } else {
+        targetTile = board[targetIndex];
+        board[targetIndex] = movingTile;
+      }
+
+      if (targetTile) {
+        if (source.area === "rack") {
+          rack[source.index] = targetTile;
         } else {
-          nextRack[source.index] = null;
+          board[source.index] = targetTile;
         }
+      }
 
-        if (targetOccupiedId) {
-          if (source.area === "board") {
-            nextBoard[source.index] = targetOccupiedId;
-          } else {
-            nextRack[source.index] = targetOccupiedId;
-          }
-        }
+      selectedTileId = null;
+      render();
+    }
 
-        if (targetArea === "board") {
-          nextBoard[targetIndex] = tileId;
-        } else {
-          nextRack[targetIndex] = tileId;
-        }
+    function createTileElement(tile) {
+      const tileEl = document.createElement("div");
+      tileEl.className = "tile";
+      if (selectedTileId === tile.id) {
+        tileEl.classList.add("selected");
+      }
 
-        setSelectedTileId(null);
-        setDragOverCell(null);
-        setDragOverRack(null);
-        return nextRack;
+      tileEl.textContent = tile.letter;
+      tileEl.draggable = true;
+
+      tileEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectedTileId = selectedTileId === tile.id ? null : tile.id;
+        render();
       });
 
-      return nextBoard;
-    });
-  }
+      tileEl.addEventListener("dragstart", () => {
+        draggedTileId = tile.id;
+        selectedTileId = tile.id;
+      });
 
-  function handleTileClick(tileId) {
-    setSelectedTileId((current) => (current === tileId ? null : tileId));
-  }
+      tileEl.addEventListener("dragend", () => {
+        draggedTileId = null;
+      });
 
-  function handleCellClick(index) {
-    if (!selectedTileId) return;
-    moveTile(selectedTileId, "board", index);
-  }
+      return tileEl;
+    }
 
-  function handleRackSlotClick(index) {
-    if (!selectedTileId) return;
-    moveTile(selectedTileId, "rack", index);
-  }
+    function render() {
+      boardEl.innerHTML = "";
+      rackEl.innerHTML = "";
 
-  function renderTile(tileId) {
-    if (!tileId) return null;
+      for (let i = 0; i < board.length; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
 
-    const tile = tileMap[tileId];
-    const isSelected = selectedTileId === tileId;
+        cell.addEventListener("click", () => {
+          if (selectedTileId !== null) {
+            moveTile(selectedTileId, "board", i);
+          }
+        });
 
-    return (
-      <button
-        key={tileId}
-        type="button"
-        draggable
-        onDragStart={() => {
-          setDraggedTileId(tileId);
-          setSelectedTileId(tileId);
-        }}
-        onDragEnd={() => {
-          setDraggedTileId(null);
-          setDragOverCell(null);
-          setDragOverRack(null);
-        }}
-        onClick={(event) => {
-          event.stopPropagation();
-          handleTileClick(tileId);
-        }}
-        className={`flex h-12 w-12 items-center justify-center rounded-md border text-lg font-bold shadow-sm transition ${
-          isSelected
-            ? "border-blue-500 bg-blue-100 ring-2 ring-blue-300"
-            : "border-amber-700 bg-amber-200 hover:bg-amber-100"
-        }`}
-      >
-        {tile.letter}
-      </button>
-    );
-  }
+        cell.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          cell.classList.add("highlight");
+        });
 
-  return (
-    <div className="min-h-screen bg-neutral-50 p-8">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="mb-8 text-4xl font-bold tracking-tight">Babble</h1>
+        cell.addEventListener("dragleave", () => {
+          cell.classList.remove("highlight");
+        });
 
-        <div className="space-y-6">
-          <div className="inline-block rounded-2xl bg-white p-4 shadow-sm">
-            <div className="grid grid-cols-7 gap-1">
-              {board.map((tileId, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleCellClick(index)}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    setDragOverCell(index);
-                  }}
-                  onDragLeave={() => {
-                    if (dragOverCell === index) setDragOverCell(null);
-                  }}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    moveTile(draggedTileId, "board", index);
-                    setDraggedTileId(null);
-                  }}
-                  className={`flex h-14 w-14 items-center justify-center rounded-md border transition ${
-                    dragOverCell === index
-                      ? "border-blue-400 bg-blue-50"
-                      : "border-neutral-300 bg-amber-50"
-                  }`}
-                >
-                  {renderTile(tileId)}
-                </button>
-              ))}
-            </div>
-          </div>
+        cell.addEventListener("drop", (e) => {
+          e.preventDefault();
+          cell.classList.remove("highlight");
+          if (draggedTileId !== null) {
+            moveTile(draggedTileId, "board", i);
+            draggedTileId = null;
+          }
+        });
 
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <div className="mb-2 text-sm font-medium text-neutral-600">Tiles</div>
-            <div className="flex flex-wrap gap-2">
-              {rack.map((tileId, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleRackSlotClick(index)}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    setDragOverRack(index);
-                  }}
-                  onDragLeave={() => {
-                    if (dragOverRack === index) setDragOverRack(null);
-                  }}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    moveTile(draggedTileId, "rack", index);
-                    setDraggedTileId(null);
-                  }}
-                  className={`flex h-14 w-14 items-center justify-center rounded-md border transition ${
-                    dragOverRack === index
-                      ? "border-blue-400 bg-blue-50"
-                      : "border-neutral-300 bg-stone-100"
-                  }`}
-                >
-                  {tileId ? (
-                    renderTile(tileId)
-                  ) : (
-                    <div className="h-12 w-12 rounded-md border border-dashed border-neutral-300 bg-white/70" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+        if (board[i]) {
+          cell.appendChild(createTileElement(board[i]));
+        }
+
+        boardEl.appendChild(cell);
+      }
+
+      for (let i = 0; i < rack.length; i++) {
+        const slot = document.createElement("div");
+        slot.className = "rack-slot";
+
+        slot.addEventListener("click", () => {
+          if (selectedTileId !== null) {
+            moveTile(selectedTileId, "rack", i);
+          }
+        });
+
+        slot.addEventListener("dragover", (e) => {
+          e.preventDefault();
+        });
+
+        slot.addEventListener("drop", (e) => {
+          e.preventDefault();
+          if (draggedTileId !== null) {
+            moveTile(draggedTileId, "rack", i);
+            draggedTileId = null;
+          }
+        });
+
+        if (rack[i]) {
+          slot.appendChild(createTileElement(rack[i]));
+        } else {
+          slot.classList.add("empty");
+        }
+
+        rackEl.appendChild(slot);
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
