@@ -26,11 +26,35 @@
     .page {
       padding: var(--page-padding);
     }
+    
+    .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 0 0 20px;
+  flex-wrap: wrap;
+}
 
-    h1 {
-      margin: 0 0 20px;
-      font-size: clamp(28px, 6vw, 40px);
-    }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 6vw, 40px);
+}
+
+.subtitle {
+  margin-top: 4px;
+  font-size: clamp(14px, 3vw, 18px);
+  color: #555;
+}
+
+.score-box {
+  background: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-size: clamp(16px, 3.6vw, 20px);
+  font-weight: 700;
+}
 
     .board-wrapper {
       display: flex;
@@ -206,7 +230,15 @@
 </head>
 <body>
   <div class="page">
+<div class="header">
+  <div>
     <h1>Babble</h1>
+    <div class="subtitle">4/2/26: All the World's</div>
+  </div>
+  <div class="score-box">
+    Score: <span id="score">0</span>
+  </div>
+</div>
     <div class="board-wrapper">
       <div id="board" class="board"></div>
       <div id="rack" class="rack"></div>
@@ -223,10 +255,11 @@
     const boardHeight = 7;
     const boardSize = boardWidth * boardHeight;
 
-    const boardEl = document.getElementById("board");
-    const rackEl = document.getElementById("rack");
-    const shuffleBtn = document.getElementById("shuffleBtn");
-    const checkBtn = document.getElementById("checkBtn");
+const boardEl = document.getElementById("board");
+const rackEl = document.getElementById("rack");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const checkBtn = document.getElementById("checkBtn");
+const scoreEl = document.getElementById("score");
 
     let dictionary = new Set();
     let dictionaryLoaded = false;
@@ -548,6 +581,40 @@ function createTileElement(tile, boardIndex = null) {
 
       return foundWords;
     }
+    function getLetterScoreAt(row, col) {
+  const letter = getBoardLetter(row, col);
+  if (!letter) return 0;
+
+  const base = letterPoints[letter] ?? 0;
+  const modifier = getModifierAt(row, col);
+
+  if (modifier && modifier.endsWith("L")) {
+    return base * Number(modifier[0]);
+  }
+
+  return base;
+}
+
+function getWordScore(wordEntry) {
+  let total = 0;
+  let wordMultiplier = 1;
+
+  for (const [row, col] of wordEntry.positions) {
+    total += getLetterScoreAt(row, col);
+
+    const modifier = getModifierAt(row, col);
+    if (modifier && modifier.endsWith("W")) {
+      wordMultiplier *= Number(modifier[0]);
+    }
+  }
+
+  return total * wordMultiplier;
+}
+
+function getTotalBoardScore() {
+  const words = getWordsFromBoard();
+  return words.reduce((sum, wordEntry) => sum + getWordScore(wordEntry), 0);
+}
 
     function checkBoardWords() {
       if (!dictionaryLoaded) {
@@ -590,6 +657,7 @@ function createTileElement(tile, boardIndex = null) {
     function render() {
       boardEl.innerHTML = "";
       rackEl.innerHTML = "";
+      scoreEl.textContent = getTotalBoardScore();
 
 for (let i = 0; i < board.length; i++) {
   const row = Math.floor(i / boardWidth);
