@@ -297,6 +297,19 @@ h1 {
 
   <script>
     const letters = "PLAYDRAMACTOSTGE".split("");
+        const boardModifiers = {
+  "0-3": "3L",
+  "4-1": "2L",
+  "0-2": "3W",
+  "4-5": "2W"
+};
+        const startingHints = {
+  "0-0": "P",
+  "4-4": "M",
+  "5-5": "G",
+  "6-5": "E"
+};
+    
     const boardWidth = 7;
     const boardHeight = 7;
     const boardSize = boardWidth * boardHeight;
@@ -315,12 +328,7 @@ const scoreEl = document.getElementById("score");
   J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3, Q: 10, R: 1,
   S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
 };
-    const boardModifiers = {
-  "0-3": "3L",
-  "4-1": "2L",
-  "0-2": "3W",
-  "4-5": "2W"
-};
+
 
     async function loadDictionary() {
       try {
@@ -354,13 +362,26 @@ const scoreEl = document.getElementById("score");
       return copy;
     }
 
-    let board = Array(boardSize).fill(null);
-    let rack = shuffleArray(
-      letters.map((letter, index) => ({
-        id: index,
-        letter
-      }))
-    );
+const allTiles = letters.map((letter, index) => ({
+  id: index,
+  letter
+}));
+
+let board = Array(boardSize).fill(null);
+
+const remainingTiles = [...allTiles];
+
+for (const [key, letter] of Object.entries(startingHintTiles)) {
+  const [row, col] = key.split("-").map(Number);
+  const boardIndex = row * boardWidth + col;
+
+  const tileIndex = remainingTiles.findIndex(tile => tile.letter === letter);
+  if (tileIndex !== -1) {
+    board[boardIndex] = remainingTiles.splice(tileIndex, 1)[0];
+  }
+}
+
+let rack = shuffleArray(remainingTiles);
 
     let selectedTileId = null;
     let draggedTileId = null;
