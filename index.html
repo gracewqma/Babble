@@ -4,14 +4,163 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Babble</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+    }
+
+    .page {
+      padding: 32px;
+    }
+
+    h1 {
+      margin-bottom: 24px;
+    }
+
+    .board-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, 56px);
+      gap: 4px;
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      width: fit-content;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .cell {
+      width: 56px;
+      height: 56px;
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+      background: #f8ecc8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cell.drag-over {
+      outline: 3px solid #7aa7ff;
+    }
+
+    .rack {
+      display: flex;
+      gap: 8px;
+      padding: 16px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      min-height: 72px;
+      flex-wrap: wrap;
+    }
+
+    .tile {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      border: 1px solid #b89f6b;
+      background: #f2d79a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .tile:active {
+      cursor: grabbing;
+    }
+  </style>
 </head>
 <body>
   <div class="page">
     <h1>Babble</h1>
-    <div id="board" class="board"></div>
+
+    <div class="board-wrapper">
+      <div id="board" class="board"></div>
+      <div id="rack" class="rack"></div>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const letters = "PLAYDRAMACTOSTGE".split("");
+    const board = document.getElementById("board");
+    const rack = document.getElementById("rack");
+
+    let draggedTile = null;
+
+    for (let i = 0; i < 49; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      cell.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        cell.classList.add("drag-over");
+      });
+
+      cell.addEventListener("dragleave", () => {
+        cell.classList.remove("drag-over");
+      });
+
+      cell.addEventListener("drop", (e) => {
+        e.preventDefault();
+        cell.classList.remove("drag-over");
+
+        if (!draggedTile) return;
+
+        if (cell.children.length === 0) {
+          cell.appendChild(draggedTile);
+        } else {
+          const existingTile = cell.children[0];
+          const fromParent = draggedTile.parentElement;
+          cell.appendChild(draggedTile);
+          fromParent.appendChild(existingTile);
+        }
+      });
+
+      board.appendChild(cell);
+    }
+
+    rack.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    rack.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (draggedTile) {
+        rack.appendChild(draggedTile);
+      }
+    });
+
+    letters.forEach((letter, index) => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.textContent = letter;
+      tile.draggable = true;
+      tile.id = `tile-${index}`;
+
+      tile.addEventListener("dragstart", () => {
+        draggedTile = tile;
+      });
+
+      tile.addEventListener("dragend", () => {
+        draggedTile = null;
+      });
+
+      rack.appendChild(tile);
+    });
+  </script>
 </body>
 </html>
