@@ -408,7 +408,7 @@
       Score: <span id="score">0</span>
     </div>
   </div>
-
+  </div>
 
     <div class="board-wrapper">
       <div id="board" class="board"></div>
@@ -1201,15 +1201,17 @@
         rackEl.appendChild(slot);
       }
 
-      hintBtn.disabled = revealedHintCount >= hintQueue.length;
-      shadowToggle.checked = shadowEnabled;
+if (hintBtn) {
+  hintBtn.disabled = revealedHintCount >= hintQueue.length;
+}      shadowToggle.checked = shadowEnabled;
       maybeCelebrateSolution();
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
     rackBtn.addEventListener("click", rackAllTiles);
-    hintBtn.addEventListener("click", revealNextHint);
-    shadowToggle.addEventListener("change", toggleShadow);
+if (hintBtn) {
+  hintBtn.addEventListener("click", revealNextHint);
+}    shadowToggle.addEventListener("change", toggleShadow);
     checkBtn.addEventListener("click", checkBoardWords);
 
     loadDictionary();
