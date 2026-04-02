@@ -36,6 +36,19 @@
       flex-wrap: wrap;
     }
 
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     h1 {
       margin: 0;
       font-size: clamp(28px, 6vw, 40px);
@@ -122,25 +135,26 @@
     .cell.mod-2l {
       background: #fde68a;
     }
+
     .cell.shadow {
-  background: #d6d6d6;
-}
+      background: #d6d6d6;
+    }
 
-.cell.shadow.mod-3w {
-  background: #b8a0ea;
-}
+    .cell.shadow.mod-3w {
+      background: #b8a0ea;
+    }
 
-.cell.shadow.mod-2w {
-  background: #79afe8;
-}
+    .cell.shadow.mod-2w {
+      background: #79afe8;
+    }
 
-.cell.shadow.mod-3l {
-  background: #6fd78f;
-}
+    .cell.shadow.mod-3l {
+      background: #6fd78f;
+    }
 
-.cell.shadow.mod-2l {
-  background: #ebd06b;
-}
+    .cell.shadow.mod-2l {
+      background: #ebd06b;
+    }
 
     .rack {
       display: grid;
@@ -170,6 +184,10 @@
       background: #fafafa;
     }
 
+    .rack-slot.highlight {
+      outline: 3px solid #7aa7ff;
+    }
+
     .tile {
       position: relative;
       width: var(--cell-size);
@@ -183,7 +201,7 @@
       cursor: grab;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
+      touch-action: none;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     }
 
@@ -276,6 +294,30 @@
       cursor: default;
     }
 
+    .top-button {
+      min-width: 0;
+      padding: 8px 14px;
+    }
+
+    .shadow-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 8px 12px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      font-size: clamp(14px, 3.6vw, 16px);
+      font-weight: 600;
+      color: #333;
+    }
+
+    .shadow-toggle input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+
     .confetti-container {
       position: fixed;
       inset: 0;
@@ -325,6 +367,10 @@
         width: 100%;
       }
 
+      .top-button {
+        width: auto;
+      }
+
       .rack {
         grid-template-columns: repeat(auto-fit, var(--cell-size));
       }
@@ -334,8 +380,15 @@
 <body>
   <div class="page">
     <div class="header">
-      <div>
-        <h1>Babble</h1>
+      <div class="header-left">
+        <div class="title-row">
+          <h1>Babble</h1>
+          <button id="hintBtn" class="control-button top-button">Hint</button>
+          <label class="shadow-toggle">
+            <input id="shadowToggle" type="checkbox" />
+            <span>Shadow</span>
+          </label>
+        </div>
         <div class="subtitle">4/2/26: All the World's</div>
       </div>
       <div class="score-box">
@@ -349,8 +402,6 @@
       <div class="controls">
         <button id="shuffleBtn" class="control-button">Shuffle</button>
         <button id="rackBtn" class="control-button">Rack</button>
-   <button id="hintBtn" class="control-button">Letter Hint</button>
-<button id="shadowBtn" class="control-button">Shadow: Off</button>
         <button id="checkBtn" class="control-button">Check</button>
       </div>
     </div>
@@ -387,7 +438,7 @@
     const shuffleBtn = document.getElementById("shuffleBtn");
     const rackBtn = document.getElementById("rackBtn");
     const hintBtn = document.getElementById("hintBtn");
-    const shadowBtn = document.getElementById("shadowBtn");
+    const shadowToggle = document.getElementById("shadowToggle");
     const checkBtn = document.getElementById("checkBtn");
     const scoreEl = document.getElementById("score");
     const confettiContainer = document.getElementById("confetti-container");
@@ -398,6 +449,9 @@
     let selectedTileId = null;
     let draggedTileId = null;
     let shadowEnabled = false;
+    let touchDraggedTileId = null;
+    let touchGhostEl = null;
+    let touchSourceEl = null;
 
     const letterPoints = {
       A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1,
@@ -428,15 +482,15 @@
 
       return placements;
     }
-    
-    function isSolutionCell(row, col) {
-  return solvedBoard[row][col] !== "·";
-}
 
-function toggleShadow() {
-  shadowEnabled = !shadowEnabled;
-  render();
-}
+    function isSolutionCell(row, col) {
+      return solvedBoard[row][col] !== "·";
+    }
+
+    function toggleShadow() {
+      shadowEnabled = shadowToggle.checked;
+      render();
+    }
 
     function getRevealPriority(entry) {
       const base = letterPoints[entry.letter] ?? 0;
@@ -452,7 +506,7 @@ function toggleShadow() {
         wordMultiplier = Number(modifier[0]);
       }
 
-      return (base * letterMultiplier * wordMultiplier);
+      return base * letterMultiplier * wordMultiplier;
     }
 
     const hintQueue = getSolutionPlacements().sort((a, b) => {
@@ -890,6 +944,92 @@ function toggleShadow() {
       }
     }
 
+    function isTouchDevice() {
+      return "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    }
+
+    function clearTouchGhost() {
+      if (touchGhostEl) {
+        touchGhostEl.remove();
+        touchGhostEl = null;
+      }
+      touchDraggedTileId = null;
+      touchSourceEl = null;
+
+      document.querySelectorAll(".cell.highlight, .rack-slot.highlight").forEach(el => {
+        el.classList.remove("highlight");
+      });
+    }
+
+    function updateTouchGhostPosition(x, y) {
+      if (!touchGhostEl) return;
+      touchGhostEl.style.left = `${x - touchGhostEl.offsetWidth / 2}px`;
+      touchGhostEl.style.top = `${y - touchGhostEl.offsetHeight / 2}px`;
+    }
+
+    function handleTouchStart(e, tile) {
+      if (tile.locked) return;
+      if (!isTouchDevice()) return;
+
+      const touch = e.touches[0];
+      touchDraggedTileId = tile.id;
+      selectedTileId = tile.id;
+
+      const ghost = e.currentTarget.cloneNode(true);
+      ghost.style.position = "fixed";
+      ghost.style.pointerEvents = "none";
+      ghost.style.zIndex = "10000";
+      ghost.style.opacity = "0.85";
+      ghost.style.transform = "scale(1.05)";
+      ghost.style.margin = "0";
+      document.body.appendChild(ghost);
+
+      touchGhostEl = ghost;
+      touchSourceEl = e.currentTarget;
+      updateTouchGhostPosition(touch.clientX, touch.clientY);
+      render();
+      e.preventDefault();
+    }
+
+    function handleTouchMove(e) {
+      if (touchDraggedTileId === null) return;
+
+      const touch = e.touches[0];
+      updateTouchGhostPosition(touch.clientX, touch.clientY);
+
+      document.querySelectorAll(".cell.highlight, .rack-slot.highlight").forEach(el => {
+        el.classList.remove("highlight");
+      });
+
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const dropTarget = target?.closest(".cell, .rack-slot");
+      if (dropTarget) {
+        dropTarget.classList.add("highlight");
+      }
+
+      e.preventDefault();
+    }
+
+    function handleTouchEnd(e) {
+      if (touchDraggedTileId === null) return;
+
+      const touch = e.changedTouches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const dropCell = target?.closest(".cell");
+      const dropRack = target?.closest(".rack-slot");
+
+      if (dropCell && dropCell.dataset.index !== undefined) {
+        moveTile(touchDraggedTileId, "board", Number(dropCell.dataset.index));
+      } else if (dropRack && dropRack.dataset.index !== undefined) {
+        moveTile(touchDraggedTileId, "rack", Number(dropRack.dataset.index));
+      } else {
+        selectedTileId = null;
+        render();
+      }
+
+      clearTouchGhost();
+    }
+
     function createTileElement(tile, boardIndex = null) {
       const tileEl = document.createElement("div");
       tileEl.className = "tile";
@@ -949,6 +1089,11 @@ function toggleShadow() {
         draggedTileId = null;
       });
 
+      tileEl.addEventListener("touchstart", (e) => handleTouchStart(e, tile), { passive: false });
+      tileEl.addEventListener("touchmove", handleTouchMove, { passive: false });
+      tileEl.addEventListener("touchend", handleTouchEnd);
+      tileEl.addEventListener("touchcancel", clearTouchGhost);
+
       return tileEl;
     }
 
@@ -964,14 +1109,15 @@ function toggleShadow() {
 
         const cell = document.createElement("div");
         cell.className = "cell";
+        cell.dataset.index = i;
 
         if (modifier) {
           cell.classList.add(getModifierClass(modifier));
         }
 
         if (shadowEnabled && isSolutionCell(row, col) && !board[i]) {
-  cell.classList.add("shadow");
-}
+          cell.classList.add("shadow");
+        }
 
         cell.addEventListener("click", () => {
           if (selectedTileId !== null) {
@@ -1012,6 +1158,7 @@ function toggleShadow() {
       for (let i = 0; i < rack.length; i++) {
         const slot = document.createElement("div");
         slot.className = "rack-slot";
+        slot.dataset.index = i;
 
         slot.addEventListener("click", () => {
           if (selectedTileId !== null) {
@@ -1041,14 +1188,14 @@ function toggleShadow() {
       }
 
       hintBtn.disabled = revealedHintCount >= hintQueue.length;
-      shadowBtn.textContent = `Shadow: ${shadowEnabled ? "On" : "Off"}`;
+      shadowToggle.checked = shadowEnabled;
       maybeCelebrateSolution();
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
     rackBtn.addEventListener("click", rackAllTiles);
     hintBtn.addEventListener("click", revealNextHint);
-    shadowBtn.addEventListener("click", toggleShadow);
+    shadowToggle.addEventListener("change", toggleShadow);
     checkBtn.addEventListener("click", checkBoardWords);
 
     loadDictionary();
