@@ -42,12 +42,12 @@
       gap: 6px;
     }
 
-    .title-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
     h1 {
       margin: 0;
@@ -67,6 +67,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       font-size: clamp(16px, 3.6vw, 20px);
       font-weight: 700;
+      width: fit-content;
     }
 
     .board-wrapper {
@@ -379,22 +380,24 @@
 </head>
 <body>
   <div class="page">
-    <div class="header">
-      <div class="header-left">
-        <div class="title-row">
-          <h1>Babble</h1>
-          <button id="hintBtn" class="control-button top-button">Hint</button>
-          <label class="shadow-toggle">
-            <input id="shadowToggle" type="checkbox" />
-            <span>Shadow</span>
-          </label>
-        </div>
-        <div class="subtitle">4/2/26: All the World's</div>
-      </div>
-      <div class="score-box">
-        Score: <span id="score">0</span>
-      </div>
+<div class="header">
+  <div class="header-left">
+    <h1>Babble</h1>
+    <div class="subtitle">4/2/26: All the World's</div>
+
+    <div class="top-controls">
+      <button id="hintBtn" class="control-button top-button">Hint (0)</button>
+      <label class="shadow-toggle">
+        <input id="shadowToggle" type="checkbox" />
+        <span>Shadow</span>
+      </label>
     </div>
+
+    <div class="score-box">
+      Score: <span id="score">0</span>
+    </div>
+  </div>
+</div>
 
     <div class="board-wrapper">
       <div id="board" class="board"></div>
