@@ -122,6 +122,25 @@
     .cell.mod-2l {
       background: #fde68a;
     }
+    .cell.shadow {
+  background: #d6d6d6;
+}
+
+.cell.shadow.mod-3w {
+  background: #b8a0ea;
+}
+
+.cell.shadow.mod-2w {
+  background: #79afe8;
+}
+
+.cell.shadow.mod-3l {
+  background: #6fd78f;
+}
+
+.cell.shadow.mod-2l {
+  background: #ebd06b;
+}
 
     .rack {
       display: grid;
@@ -330,7 +349,8 @@
       <div class="controls">
         <button id="shuffleBtn" class="control-button">Shuffle</button>
         <button id="rackBtn" class="control-button">Rack</button>
-        <button id="hintBtn" class="control-button">Hint</button>
+   <button id="hintBtn" class="control-button">Letter Hint</button>
+<button id="shadowBtn" class="control-button">Shadow: Off</button>
         <button id="checkBtn" class="control-button">Check</button>
       </div>
     </div>
@@ -367,6 +387,7 @@
     const shuffleBtn = document.getElementById("shuffleBtn");
     const rackBtn = document.getElementById("rackBtn");
     const hintBtn = document.getElementById("hintBtn");
+    const shadowBtn = document.getElementById("shadowBtn");
     const checkBtn = document.getElementById("checkBtn");
     const scoreEl = document.getElementById("score");
     const confettiContainer = document.getElementById("confetti-container");
@@ -376,6 +397,7 @@
     let confettiActive = false;
     let selectedTileId = null;
     let draggedTileId = null;
+    let shadowEnabled = false;
 
     const letterPoints = {
       A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1,
@@ -406,6 +428,15 @@
 
       return placements;
     }
+    
+    function isSolutionCell(row, col) {
+  return solvedBoard[row][col] !== "·";
+}
+
+function toggleShadow() {
+  shadowEnabled = !shadowEnabled;
+  render();
+}
 
     function getRevealPriority(entry) {
       const base = letterPoints[entry.letter] ?? 0;
@@ -938,6 +969,10 @@
           cell.classList.add(getModifierClass(modifier));
         }
 
+        if (shadowEnabled && isSolutionCell(row, col) && !board[i]) {
+  cell.classList.add("shadow");
+}
+
         cell.addEventListener("click", () => {
           if (selectedTileId !== null) {
             moveTile(selectedTileId, "board", i);
@@ -1006,12 +1041,14 @@
       }
 
       hintBtn.disabled = revealedHintCount >= hintQueue.length;
+      shadowBtn.textContent = `Shadow: ${shadowEnabled ? "On" : "Off"}`;
       maybeCelebrateSolution();
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
     rackBtn.addEventListener("click", rackAllTiles);
     hintBtn.addEventListener("click", revealNextHint);
+    shadowBtn.addEventListener("click", toggleShadow);
     checkBtn.addEventListener("click", checkBoardWords);
 
     loadDictionary();
