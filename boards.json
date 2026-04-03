@@ -22,13 +22,12 @@
     "date": "2026-04-03",
     "title": "Salad, Yummy Yummy",
     "solution": [
-      "·FIG·O·",
-      "A··R·R·",
-      "PAPAYA·",
-      "P··P·N·",
-      "LIME·G·",
-      "E····E·",
-      "·······"
+      "·FIG·O",
+      "A··R·R",
+      "PAPAYA",
+      "P··P·N",
+      "LIME·G",
+      "E····E",
     ],
     "modifiers": {
       "0-3": "2L",
@@ -60,13 +59,12 @@
     "date": "2026-04-05",
     "title": "Old McDonald",
     "solution": [
-      "R······",
-      "ALPACA·",
-      "B·I····",
-      "B·GOAT·",
-      "I······",
-      "TURKEY·",
-      "·······"
+      "R·····",
+      "ALPACA",
+      "B·I···",
+      "B·GOAT",
+      "I·····",
+      "TURKEY",
     ],
     "modifiers": {
       "1-2": "2W",
@@ -79,19 +77,19 @@
     "date": "2026-04-06",
     "title": "Of a Feather",
     "solution": [
-      "PARROT·",
-      "··O···F",
-      "··B·H·I",
-      "·PIGEON",
-      "··N·R·C",
-      "····O·H",
-      "RAVEN··"
+      "GOOSE·",
+      "···W·H",
+      "·CRANE",
+      "·R·N·R",
+      "·O···O",
+      "OWL··N"
     ],
     "modifiers": {
-      "1-6": "3L",
-      "3-1": "2L",
-      "3-6": "3W",
-      "6-4": "2W"
+      "0-3": "2W",
+      "2-1": "3W",
+      "2-3": "2L",
+      "5-1": "3L"
     }
+  }
   }
 ]
