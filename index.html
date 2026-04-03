@@ -510,6 +510,7 @@ let boardSize = 0;
     let board = Array(boardSize).fill(null);
     let rack = [];
     let revealedHintCount = 0;
+    let hintWord = "";
 
     const subtitleEl = document.getElementById("subtitle");
     const boardEl = document.getElementById("board");
@@ -606,6 +607,7 @@ function applyPuzzle(puzzle) {
   activePuzzle = puzzle;
   solvedBoard = Array.isArray(puzzle.solution) ? puzzle.solution : [];
   boardModifiers = puzzle.modifiers ?? {};
+  hintWord = (puzzle.hint ?? "").toUpperCase();
 
   boardHeight = solvedBoard.length;
   boardWidth = solvedBoard[0]?.length ?? 0;
@@ -953,69 +955,77 @@ function applyPuzzle(puzzle) {
       return foundWords;
     }
 
-        function getLongestSolutionWordPlacement() {
-      let best = null;
+function getHintWordPlacement() {
+  if (!hintWord) return null;
 
-      // horizontal
-      for (let row = 0; row < boardHeight; row++) {
-        let currentWord = "";
-        let positions = [];
+  // horizontal
+  for (let row = 0; row < boardHeight; row++) {
+    let currentWord = "";
+    let positions = [];
 
-        for (let col = 0; col < boardWidth; col++) {
-          const letter = solvedBoard[row]?.[col];
+    for (let col = 0; col < boardWidth; col++) {
+      const letter = solvedBoard[row]?.[col];
 
-          if (letter && letter !== "·") {
-            currentWord += letter;
-            positions.push({ row, col, letter });
-          } else {
-            if (currentWord.length >= 2) {
-              if (!best || currentWord.length > best.word.length) {
-                best = { word: currentWord, positions: [...positions] };
-              }
-            }
-            currentWord = "";
-            positions = [];
-          }
+      if (letter && letter !== "·") {
+        currentWord += letter;
+        positions.push({ row, col, letter });
+      } else {
+        const startIndex = currentWord.indexOf(hintWord);
+        if (startIndex !== -1) {
+          return {
+            word: hintWord,
+            positions: positions.slice(startIndex, startIndex + hintWord.length)
+          };
         }
-
-        if (currentWord.length >= 2) {
-          if (!best || currentWord.length > best.word.length) {
-            best = { word: currentWord, positions: [...positions] };
-          }
-        }
+        currentWord = "";
+        positions = [];
       }
-
-      // vertical
-      for (let col = 0; col < boardWidth; col++) {
-        let currentWord = "";
-        let positions = [];
-
-        for (let row = 0; row < boardHeight; row++) {
-          const letter = solvedBoard[row]?.[col];
-
-          if (letter && letter !== "·") {
-            currentWord += letter;
-            positions.push({ row, col, letter });
-          } else {
-            if (currentWord.length >= 2) {
-              if (!best || currentWord.length > best.word.length) {
-                best = { word: currentWord, positions: [...positions] };
-              }
-            }
-            currentWord = "";
-            positions = [];
-          }
-        }
-
-        if (currentWord.length >= 2) {
-          if (!best || currentWord.length > best.word.length) {
-            best = { word: currentWord, positions: [...positions] };
-          }
-        }
-      }
-
-      return best;
     }
+
+    const startIndex = currentWord.indexOf(hintWord);
+    if (startIndex !== -1) {
+      return {
+        word: hintWord,
+        positions: positions.slice(startIndex, startIndex + hintWord.length)
+      };
+    }
+  }
+
+  // vertical
+  for (let col = 0; col < boardWidth; col++) {
+    let currentWord = "";
+    let positions = [];
+
+    for (let row = 0; row < boardHeight; row++) {
+      const letter = solvedBoard[row]?.[col];
+
+      if (letter && letter !== "·") {
+        currentWord += letter;
+        positions.push({ row, col, letter });
+      } else {
+        const startIndex = currentWord.indexOf(hintWord);
+        if (startIndex !== -1) {
+          return {
+            word: hintWord,
+            positions: positions.slice(startIndex, startIndex + hintWord.length)
+          };
+        }
+        currentWord = "";
+        positions = [];
+      }
+    }
+
+    const startIndex = currentWord.indexOf(hintWord);
+    if (startIndex !== -1) {
+      return {
+        word: hintWord,
+        positions: positions.slice(startIndex, startIndex + hintWord.length)
+      };
+    }
+  }
+
+  return null;
+}
 
     function getLetterScoreAt(row, col) {
       const letter = getBoardLetter(row, col);
@@ -1221,39 +1231,38 @@ function applyPuzzle(puzzle) {
       return null;
     }
 
-        function revealStartingHintWord() {
-      const longestWord = getLongestSolutionWordPlacement();
-      if (!longestWord) return;
+function revealStartingHintWord() {
+  const hintPlacement = getHintWordPlacement();
+  if (!hintPlacement) return;
 
-      for (const cell of longestWord.positions) {
-        const targetIndex = cell.row * boardWidth + cell.col;
-        const currentTargetTile = board[targetIndex];
+  for (const cell of hintPlacement.positions) {
+    const targetIndex = cell.row * boardWidth + cell.col;
+    const currentTargetTile = board[targetIndex];
 
-        if (currentTargetTile?.locked && currentTargetTile.letter === cell.letter) {
-          continue;
-        }
-
-        const source = findMovableTileByLetter(cell.letter);
-        if (!source) continue;
-
-        let displacedTile = null;
-        if (currentTargetTile && !currentTargetTile.locked) {
-          displacedTile = currentTargetTile;
-        }
-
-        if (source.area === "rack") {
-          rack[source.index] = displacedTile;
-        } else {
-          board[source.index] = displacedTile;
-        }
-
-        source.tile.locked = true;
-        board[targetIndex] = source.tile;
-      }
-
-      selectedTileId = null;
-      draggedTileId = null;
+    if (currentTargetTile && currentTargetTile.letter === cell.letter) {
+      continue;
     }
+
+    const source = findMovableTileByLetter(cell.letter);
+    if (!source) continue;
+
+    let displacedTile = null;
+    if (currentTargetTile && !currentTargetTile.locked) {
+      displacedTile = currentTargetTile;
+    }
+
+    if (source.area === "rack") {
+      rack[source.index] = displacedTile;
+    } else {
+      board[source.index] = displacedTile;
+    }
+
+    board[targetIndex] = source.tile;
+  }
+
+  selectedTileId = null;
+  draggedTileId = null;
+}
 
     function revealNextHint() {
       const nextHint = getNextUnrevealedHint();
