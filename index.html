@@ -632,6 +632,8 @@ function applyPuzzle(puzzle) {
   revealedHintCount = 0;
   shadowEnabled = false;
 
+    revealStartingHintWord();
+
   if (subtitleEl) {
     const today = getTodayPuzzleDateString();
     const fallbackLabel = puzzle.date === today ? "" : " (most recent)";
@@ -952,6 +954,70 @@ function applyPuzzle(puzzle) {
       return foundWords;
     }
 
+        function getLongestSolutionWordPlacement() {
+      let best = null;
+
+      // horizontal
+      for (let row = 0; row < boardHeight; row++) {
+        let currentWord = "";
+        let positions = [];
+
+        for (let col = 0; col < boardWidth; col++) {
+          const letter = solvedBoard[row]?.[col];
+
+          if (letter && letter !== "·") {
+            currentWord += letter;
+            positions.push({ row, col, letter });
+          } else {
+            if (currentWord.length >= 2) {
+              if (!best || currentWord.length > best.word.length) {
+                best = { word: currentWord, positions: [...positions] };
+              }
+            }
+            currentWord = "";
+            positions = [];
+          }
+        }
+
+        if (currentWord.length >= 2) {
+          if (!best || currentWord.length > best.word.length) {
+            best = { word: currentWord, positions: [...positions] };
+          }
+        }
+      }
+
+      // vertical
+      for (let col = 0; col < boardWidth; col++) {
+        let currentWord = "";
+        let positions = [];
+
+        for (let row = 0; row < boardHeight; row++) {
+          const letter = solvedBoard[row]?.[col];
+
+          if (letter && letter !== "·") {
+            currentWord += letter;
+            positions.push({ row, col, letter });
+          } else {
+            if (currentWord.length >= 2) {
+              if (!best || currentWord.length > best.word.length) {
+                best = { word: currentWord, positions: [...positions] };
+              }
+            }
+            currentWord = "";
+            positions = [];
+          }
+        }
+
+        if (currentWord.length >= 2) {
+          if (!best || currentWord.length > best.word.length) {
+            best = { word: currentWord, positions: [...positions] };
+          }
+        }
+      }
+
+      return best;
+    }
+
     function getLetterScoreAt(row, col) {
       const letter = getBoardLetter(row, col);
       if (!letter) return 0;
@@ -1154,6 +1220,40 @@ function applyPuzzle(puzzle) {
       }
 
       return null;
+    }
+
+        function revealStartingHintWord() {
+      const longestWord = getLongestSolutionWordPlacement();
+      if (!longestWord) return;
+
+      for (const cell of longestWord.positions) {
+        const targetIndex = cell.row * boardWidth + cell.col;
+        const currentTargetTile = board[targetIndex];
+
+        if (currentTargetTile?.locked && currentTargetTile.letter === cell.letter) {
+          continue;
+        }
+
+        const source = findMovableTileByLetter(cell.letter);
+        if (!source) continue;
+
+        let displacedTile = null;
+        if (currentTargetTile && !currentTargetTile.locked) {
+          displacedTile = currentTargetTile;
+        }
+
+        if (source.area === "rack") {
+          rack[source.index] = displacedTile;
+        } else {
+          board[source.index] = displacedTile;
+        }
+
+        source.tile.locked = true;
+        board[targetIndex] = source.tile;
+      }
+
+      selectedTileId = null;
+      draggedTileId = null;
     }
 
     function revealNextHint() {
