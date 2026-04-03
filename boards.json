@@ -22,12 +22,13 @@
     "date": "2026-04-03",
     "title": "Salad, Yummy Yummy",
     "solution": [
-      "·FIG·O",
-      "A··R·R",
-      "PAPAYA",
-      "P··P·N",
-      "LIME·G",
-      "E····E"
+      "·FIG·O·",
+      "A··R·R·",
+      "PAPAYA·",
+      "P··P·N·",
+      "LIME·G·",
+      "E····E·",
+      "·······"
     ],
     "modifiers": {
       "0-3": "2L",
