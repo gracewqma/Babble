@@ -1256,7 +1256,7 @@ function revealStartingHintWord() {
     } else {
       board[source.index] = displacedTile;
     }
-
+source.tile.isStartingHint = true;
     board[targetIndex] = source.tile;
   }
 
