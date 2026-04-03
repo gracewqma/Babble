@@ -17,5 +17,24 @@
   "1-2": "2L",
   "4-5": "2W"
     }
+  }, 
+    {
+    "date": "2026-04-03",
+    "title": "Salad, Yummy Yummy",
+    "solution": [
+      "B·PEAR·",
+      "A···V·D",
+      "N·G·O·A",
+      "APRICOT",
+      "N·A·A·E",
+      "A·P·D··",
+      "·LEMON·"
+    ],
+    "modifiers": {
+      "3-0": "2W",
+      "3-4": "3L",
+      "6-3": "2L",
+      "6-4": "3W"
+    }
   }
 ]
