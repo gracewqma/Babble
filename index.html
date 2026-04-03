@@ -1116,13 +1116,6 @@ const boardModifiers = {
       }, 5200);
     }
 
-    function maybeCelebrateSolution() {
-      if (isSolvedBoard() && !confettiActive) {
-        confettiActive = true;
-        launchConfetti();
-      }
-    }
-
     function getNextUnrevealedHint() {
       while (revealedHintCount < hintQueue.length) {
         const nextHint = hintQueue[revealedHintCount];
@@ -1195,6 +1188,17 @@ const boardModifiers = {
       const invalidWords = wordsOnBoard.filter(entry => !dictionary.has(entry.word.toUpperCase()));
       const validWords = wordsOnBoard.filter(entry => dictionary.has(entry.word.toUpperCase()));
       const starCount = countStars(score, usedAllLetters);
+
+      if (
+        usedAllLetters &&
+        connected &&
+        hasWords &&
+        invalidWords.length === 0 &&
+        !confettiActive
+      ) {
+        confettiActive = true;
+        launchConfetti();
+      }
 
       showCheckModal({
         score,
@@ -1456,7 +1460,6 @@ const boardModifiers = {
       }
 
       shadowToggle.checked = shadowEnabled;
-      maybeCelebrateSolution();
     }
 
     shuffleBtn.addEventListener("click", shuffleRack);
