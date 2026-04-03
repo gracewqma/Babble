@@ -82,7 +82,7 @@
 
     .board {
       display: grid;
-      grid-template-columns: repeat(7, var(--cell-size));
+      grid-template-columns: repeat(var(--board-cols, 7), var(--cell-size));
       gap: var(--board-gap);
       background: white;
       padding: clamp(8px, 2.5vw, 16px);
@@ -498,9 +498,9 @@
   </div>
 
   <script>
-    const boardWidth = 7;
-    const boardHeight = 7;
-    const boardSize = boardWidth * boardHeight;
+let boardWidth = 0;
+let boardHeight = 0;
+let boardSize = 0;
 
     let boardsData = [];
     let activePuzzle = null;
@@ -603,27 +603,41 @@
       return sortedBoards[sortedBoards.length - 1] ?? null;
     }
 
-    function applyPuzzle(puzzle) {
-      activePuzzle = puzzle;
-      solvedBoard = Array.isArray(puzzle.solution) ? puzzle.solution : [];
-      boardModifiers = puzzle.modifiers ?? {};
-      letters = inferLettersFromSolution(solvedBoard);
+function applyPuzzle(puzzle) {
+  activePuzzle = puzzle;
+  solvedBoard = Array.isArray(puzzle.solution) ? puzzle.solution : [];
+  boardModifiers = puzzle.modifiers ?? {};
 
-      allTiles = buildTilesFromLetters(letters);
-      board = Array(boardSize).fill(null);
-      rack = shuffleArray([...allTiles]);
+  boardHeight = solvedBoard.length;
+  boardWidth = solvedBoard[0]?.length ?? 0;
+  boardSize = boardWidth * boardHeight;
 
-      selectedTileId = null;
-      draggedTileId = null;
-      revealedHintCount = 0;
-      shadowEnabled = false;
+  if (boardHeight === 0 || boardWidth === 0) {
+    throw new Error("Puzzle solution is empty.");
+  }
 
-      if (subtitleEl) {
-        const today = getTodayPuzzleDateString();
-        const fallbackLabel = puzzle.date === today ? "" : " (most recent)";
-        subtitleEl.textContent = `${formatPuzzleDate(puzzle.date)}: ${puzzle.title}${fallbackLabel}`;
-      }
-    }
+  const badRow = solvedBoard.find(row => row.length !== boardWidth);
+  if (badRow) {
+    throw new Error("Puzzle solution rows are not all the same length.");
+  }
+
+  letters = inferLettersFromSolution(solvedBoard);
+  allTiles = buildTilesFromLetters(letters);
+
+  board = Array(boardSize).fill(null);
+  rack = shuffleArray([...allTiles]);
+
+  selectedTileId = null;
+  draggedTileId = null;
+  revealedHintCount = 0;
+  shadowEnabled = false;
+
+  if (subtitleEl) {
+    const today = getTodayPuzzleDateString();
+    const fallbackLabel = puzzle.date === today ? "" : " (most recent)";
+    subtitleEl.textContent = `${formatPuzzleDate(puzzle.date)}: ${puzzle.title}${fallbackLabel}`;
+  }
+}
 
     async function loadBoards() {
       const response = await fetch("./boards.json");
@@ -1379,6 +1393,7 @@
     function render() {
       boardEl.innerHTML = "";
       rackEl.innerHTML = "";
+      boardEl.style.setProperty("--board-cols", boardWidth);
       scoreEl.textContent = getTotalBoardScore();
 
       for (let i = 0; i < board.length; i++) {
