@@ -22,19 +22,19 @@
     "date": "2026-04-03",
     "title": "Salad, Yummy Yummy",
     "solution": [
-      "B·PEAR·",
-      "A···V·D",
-      "N·G·O·A",
+      "B·APPLE",
+      "A···E··",
+      "N·G·A··",
       "APRICOT",
-      "N·A·A·E",
-      "A·P·D··",
+      "N·A·H··",
+      "A·P····",
       "·LEMON·"
     ],
     "modifiers": {
       "0-0": "2L",
+      "0-4": "2W",
       "3-0": "3W",
-      "3-4": "3L",
-      "6-4": "2W"
+      "3-4": "3L"
     }
   },
   {
