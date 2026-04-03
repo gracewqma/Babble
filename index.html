@@ -987,87 +987,59 @@ const boardModifiers = {
       const {
         score,
         starCount,
-        wordsOnBoard,
-        validWords,
         invalidWords,
         connected,
-        usedAllLetters,
+        usedLettersCount,
+        totalLettersCount,
         hasWords
       } = result;
 
-      const wordsText = wordsOnBoard.length
-        ? wordsOnBoard.map(entry => entry.word).join(", ")
-        : "None";
+      if (!hasWords) {
+        checkModalContent.innerHTML = `
+          <div class="check-section">
+            <h3>No words yet</h3>
+            <div>Put some tiles on the board first.</div>
+          </div>
+        `;
+        checkModalBackdrop.classList.add("open");
+        return;
+      }
 
-      const invalidText = invalidWords.length
-        ? invalidWords.map(entry => `${entry.word} (${entry.direction})`).join(", ")
-        : "None";
+      if (!connected) {
+        checkModalContent.innerHTML = `
+          <div class="check-section">
+            <h3>Not connected</h3>
+            <div>Your words are not connected in a crossword-like way.</div>
+          </div>
+        `;
+        checkModalBackdrop.classList.add("open");
+        return;
+      }
 
-      const validText = validWords.length
-        ? validWords.map(entry => entry.word).join(", ")
-        : "None";
+      if (invalidWords.length > 0) {
+        checkModalContent.innerHTML = `
+          <div class="check-section">
+            <h3>Invalid words</h3>
+            <div>These words are not valid:</div>
+            <ul class="check-list">
+              ${invalidWords.map(entry => `<li>${entry.word} (${entry.direction})</li>`).join("")}
+            </ul>
+          </div>
+        `;
+        checkModalBackdrop.classList.add("open");
+        return;
+      }
 
       checkModalContent.innerHTML = `
         <div class="check-summary">
-          <div class="check-summary-label">Points</div>
-          <div class="check-summary-value">${score}</div>
-
           <div class="check-summary-label">Stars</div>
           <div class="check-summary-value">${renderStars(starCount)}</div>
 
-          <div class="check-summary-label">Connected</div>
-          <div class="check-summary-value ${connected ? "check-status-good" : "check-status-bad"}">
-            ${connected ? "Yes" : "No"}
-          </div>
+          <div class="check-summary-label">Score</div>
+          <div class="check-summary-value">${score}</div>
 
-          <div class="check-summary-label">Used all letters</div>
-          <div class="check-summary-value ${usedAllLetters ? "check-status-good" : "check-status-bad"}">
-            ${usedAllLetters ? "Yes" : "No"}
-          </div>
-
-          <div class="check-summary-label">Words found</div>
-          <div class="check-summary-value ${hasWords ? "check-status-good" : "check-status-bad"}">
-            ${wordsOnBoard.length}
-          </div>
-        </div>
-
-        <div class="check-section">
-          <h3>Status</h3>
-          <ul class="check-list">
-            <li class="${hasWords ? "check-status-good" : "check-status-bad"}">
-              ${hasWords ? "At least one word found." : "No words on the board yet."}
-            </li>
-            <li class="${connected ? "check-status-good" : "check-status-bad"}">
-              ${connected ? "All tiles are connected crossword-style." : "Tiles must all connect in one crossword-style group."}
-            </li>
-            <li class="${invalidWords.length === 0 && hasWords ? "check-status-good" : "check-status-bad"}">
-              ${invalidWords.length === 0 && hasWords ? "All words are valid." : "Some words are invalid."}
-            </li>
-          </ul>
-        </div>
-
-        <div class="check-section">
-          <h3>Words on board</h3>
-          <div>${wordsText}</div>
-        </div>
-
-        <div class="check-section">
-          <h3>Valid words</h3>
-          <div>${validText}</div>
-        </div>
-
-        <div class="check-section">
-          <h3>Invalid words</h3>
-          <div>${invalidText}</div>
-        </div>
-
-        <div class="check-section">
-          <h3>Star goals</h3>
-          <ul class="check-list">
-            <li>1 star: 50+ points</li>
-            <li>2 stars: use all letters</li>
-            <li>3 stars: 100+ points</li>
-          </ul>
+          <div class="check-summary-label">Letters used</div>
+          <div class="check-summary-value">${usedLettersCount}/${totalLettersCount}</div>
         </div>
       `;
 
@@ -1173,7 +1145,7 @@ const boardModifiers = {
       render();
     }
 
-    function checkBoardWords() {
+       function checkBoardWords() {
       if (!dictionaryLoaded) {
         alert("Dictionary is still loading.");
         return;
@@ -1183,17 +1155,19 @@ const boardModifiers = {
       const hasWords = wordsOnBoard.length > 0;
       const connected = areBoardTilesConnected();
       const score = getTotalBoardScore();
-      const usedAllLetters = getFilledBoardIndexes().length === allTiles.length;
+
+      const usedLettersCount = getFilledBoardIndexes().length;
+      const totalLettersCount = allTiles.length;
+      const usedAllLetters = usedLettersCount === totalLettersCount;
 
       const invalidWords = wordsOnBoard.filter(entry => !dictionary.has(entry.word.toUpperCase()));
-      const validWords = wordsOnBoard.filter(entry => dictionary.has(entry.word.toUpperCase()));
       const starCount = countStars(score, usedAllLetters);
 
       if (
-        usedAllLetters &&
-        connected &&
         hasWords &&
+        connected &&
         invalidWords.length === 0 &&
+        usedAllLetters &&
         !confettiActive
       ) {
         confettiActive = true;
@@ -1203,15 +1177,14 @@ const boardModifiers = {
       showCheckModal({
         score,
         starCount,
-        wordsOnBoard,
-        validWords,
         invalidWords,
         connected,
-        usedAllLetters,
+        usedLettersCount,
+        totalLettersCount,
         hasWords
       });
     }
-
+    
     function isTouchDevice() {
       return "ontouchstart" in window || navigator.maxTouchPoints > 0;
     }
