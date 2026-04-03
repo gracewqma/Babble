@@ -487,7 +487,7 @@
     <div class="header">
       <div class="header-left">
         <h1>Babble</h1>
-        <div class="subtitle">4/2/26: All the World's</div>
+<div id="subtitle" class="subtitle"></div>
       </div>
 
       <div class="header-right">
@@ -524,29 +524,17 @@
   </div>
 
   <script>
-    const letters = "PLAYDRAMACTOSTGE".split("");
-
     const boardWidth = 7;
     const boardHeight = 7;
     const boardSize = boardWidth * boardHeight;
 
-const boardModifiers = {
-  "0-2": "3W",
-  "0-3": "3L",
-  "1-2": "2L",
-  "4-5": "2W"
-};
+    let boardsData = [];
+    let activePuzzle = null;
+    let boardModifiers = {};
+    let solvedBoard = [];
+    let letters = [];
 
-    const solvedBoard = [
-      "PLAY···",
-      "··C····",
-      "··T··S·",
-      "··O··T·",
-      "·DRAMA·",
-      "·····G·",
-      "·····E·"
-    ];
-
+        const subtitleEl = document.getElementById("subtitle");
     const boardEl = document.getElementById("board");
     const rackEl = document.getElementById("rack");
     const shuffleBtn = document.getElementById("shuffleBtn");
@@ -576,14 +564,9 @@ const boardModifiers = {
       S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
     };
 
-    const allTiles = letters.map((letter, index) => ({
-      id: index,
-      letter,
-      locked: false
-    }));
-
+    let allTiles = [];
     let board = Array(boardSize).fill(null);
-    let rack = shuffleArray([...allTiles]);
+    let rack = [];
 
     function getSolutionPlacements() {
       const placements = [];
@@ -638,6 +621,78 @@ const boardModifiers = {
     });
 
     let revealedHintCount = 0;
+
+        function formatPuzzleDate(dateString) {
+      const date = new Date(`${dateString}T00:00:00`);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const year = String(date.getFullYear()).slice(-2);
+      return `${month}/${day}/${year}`;
+    }
+
+    function inferLettersFromSolution(solutionRows) {
+      return solutionRows
+        .join("")
+        .split("")
+        .filter(char => char !== "·");
+    }
+
+    function buildTilesFromLetters(letterList) {
+      return letterList.map((letter, index) => ({
+        id: index,
+        letter,
+        locked: false
+      }));
+    }
+
+    function getTodayPuzzleDateString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function getPuzzleForToday(boards) {
+      const today = getTodayPuzzleDateString();
+      return boards.find(board => board.date === today) ?? null;
+    }
+
+    function applyPuzzle(puzzle) {
+      activePuzzle = puzzle;
+      solvedBoard = puzzle.solution;
+      boardModifiers = puzzle.modifiers ?? {};
+      letters = inferLettersFromSolution(solvedBoard);
+
+      allTiles = buildTilesFromLetters(letters);
+      board = Array(boardSize).fill(null);
+      rack = shuffleArray([...allTiles]);
+
+      if (subtitleEl) {
+        subtitleEl.textContent = `${formatPuzzleDate(puzzle.date)}: ${puzzle.title}`;
+      }
+    }
+
+    async function loadBoards() {
+      const response = await fetch("./boards.json");
+      if (!response.ok) {
+        throw new Error(`Failed to load boards.json: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("boards.json is empty or invalid.");
+      }
+
+      boardsData = data;
+
+      const todaysPuzzle = getPuzzleForToday(boardsData);
+      if (!todaysPuzzle) {
+        throw new Error(`No puzzle found for today (${getTodayPuzzleDateString()}).`);
+      }
+
+      applyPuzzle(todaysPuzzle);
+    }
 
     async function loadDictionary() {
       try {
@@ -1458,8 +1513,18 @@ const boardModifiers = {
       }
     });
 
-    loadDictionary();
-    render();
+    async function init() {
+      try {
+        await loadBoards();
+        await loadDictionary();
+        render();
+      } catch (error) {
+        console.error(error);
+        alert(error.message || "Failed to load puzzle.");
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
