@@ -50,13 +50,6 @@
       gap: 10px;
     }
 
-    .top-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
     h1 {
       margin: 0;
       font-size: clamp(28px, 6vw, 40px);
@@ -303,11 +296,6 @@
       cursor: default;
     }
 
-    .top-button {
-      min-width: 0;
-      padding: 8px 14px;
-    }
-
     .shadow-toggle {
       display: inline-flex;
       align-items: center;
@@ -429,16 +417,6 @@
       color: #333;
     }
 
-    .check-status-good {
-      color: #18794e;
-      font-weight: 700;
-    }
-
-    .check-status-bad {
-      color: #c0392b;
-      font-weight: 700;
-    }
-
     .check-close {
       margin-top: 18px;
       width: 100%;
@@ -472,10 +450,6 @@
         padding: 10px 8px;
       }
 
-      .top-button {
-        width: auto;
-      }
-
       .rack {
         grid-template-columns: repeat(auto-fit, var(--cell-size));
       }
@@ -487,7 +461,7 @@
     <div class="header">
       <div class="header-left">
         <h1>Babble</h1>
-<div id="subtitle" class="subtitle"></div>
+        <div id="subtitle" class="subtitle"></div>
       </div>
 
       <div class="header-right">
@@ -533,8 +507,12 @@
     let boardModifiers = {};
     let solvedBoard = [];
     let letters = [];
+    let allTiles = [];
+    let board = Array(boardSize).fill(null);
+    let rack = [];
+    let revealedHintCount = 0;
 
-        const subtitleEl = document.getElementById("subtitle");
+    const subtitleEl = document.getElementById("subtitle");
     const boardEl = document.getElementById("board");
     const rackEl = document.getElementById("rack");
     const shuffleBtn = document.getElementById("shuffleBtn");
@@ -564,65 +542,7 @@
       S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10
     };
 
-    let allTiles = [];
-    let board = Array(boardSize).fill(null);
-    let rack = [];
-
-    function getSolutionPlacements() {
-      const placements = [];
-
-      for (let row = 0; row < boardHeight; row++) {
-        for (let col = 0; col < boardWidth; col++) {
-          const letter = solvedBoard[row][col];
-          if (letter !== "·") {
-            placements.push({ row, col, letter });
-          }
-        }
-      }
-
-      return placements;
-    }
-
-    function isSolutionCell(row, col) {
-      return solvedBoard[row][col] !== "·";
-    }
-
-    function toggleShadow() {
-      shadowEnabled = shadowToggle.checked;
-      render();
-    }
-
-    function getRevealPriority(entry) {
-      const base = letterPoints[entry.letter] ?? 0;
-      const modifier = getModifierAt(entry.row, entry.col);
-
-      let letterMultiplier = 1;
-      let wordMultiplier = 1;
-
-      if (modifier && modifier.endsWith("L")) {
-        letterMultiplier = Number(modifier[0]);
-      }
-      if (modifier && modifier.endsWith("W")) {
-        wordMultiplier = Number(modifier[0]);
-      }
-
-      return base * letterMultiplier * wordMultiplier;
-    }
-
-    const hintQueue = getSolutionPlacements().sort((a, b) => {
-      const diff = getRevealPriority(b) - getRevealPriority(a);
-      if (diff !== 0) return diff;
-
-      const baseDiff = (letterPoints[b.letter] ?? 0) - (letterPoints[a.letter] ?? 0);
-      if (baseDiff !== 0) return baseDiff;
-
-      if (a.row !== b.row) return a.row - b.row;
-      return a.col - b.col;
-    });
-
-    let revealedHintCount = 0;
-
-        function formatPuzzleDate(dateString) {
+    function formatPuzzleDate(dateString) {
       const date = new Date(`${dateString}T00:00:00`);
       const month = date.getMonth() + 1;
       const day = date.getDate();
@@ -645,6 +565,15 @@
       }));
     }
 
+    function shuffleArray(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
     function getTodayPuzzleDateString() {
       const now = new Date();
       const year = now.getFullYear();
@@ -653,14 +582,30 @@
       return `${year}-${month}-${day}`;
     }
 
-    function getPuzzleForToday(boards) {
+    function getPuzzleForTodayOrMostRecent(boards) {
       const today = getTodayPuzzleDateString();
-      return boards.find(board => board.date === today) ?? null;
+      const sortedBoards = [...boards].sort((a, b) => a.date.localeCompare(b.date));
+
+      const exactMatch = sortedBoards.find(board => board.date === today);
+      if (exactMatch) return exactMatch;
+
+      let mostRecentPastPuzzle = null;
+      for (const puzzle of sortedBoards) {
+        if (puzzle.date <= today) {
+          mostRecentPastPuzzle = puzzle;
+        }
+      }
+
+      if (mostRecentPastPuzzle) {
+        return mostRecentPastPuzzle;
+      }
+
+      return sortedBoards[sortedBoards.length - 1] ?? null;
     }
 
     function applyPuzzle(puzzle) {
       activePuzzle = puzzle;
-      solvedBoard = puzzle.solution;
+      solvedBoard = Array.isArray(puzzle.solution) ? puzzle.solution : [];
       boardModifiers = puzzle.modifiers ?? {};
       letters = inferLettersFromSolution(solvedBoard);
 
@@ -668,8 +613,15 @@
       board = Array(boardSize).fill(null);
       rack = shuffleArray([...allTiles]);
 
+      selectedTileId = null;
+      draggedTileId = null;
+      revealedHintCount = 0;
+      shadowEnabled = false;
+
       if (subtitleEl) {
-        subtitleEl.textContent = `${formatPuzzleDate(puzzle.date)}: ${puzzle.title}`;
+        const today = getTodayPuzzleDateString();
+        const fallbackLabel = puzzle.date === today ? "" : " (most recent)";
+        subtitleEl.textContent = `${formatPuzzleDate(puzzle.date)}: ${puzzle.title}${fallbackLabel}`;
       }
     }
 
@@ -685,13 +637,13 @@
       }
 
       boardsData = data;
+      const puzzleToLoad = getPuzzleForTodayOrMostRecent(boardsData);
 
-      const todaysPuzzle = getPuzzleForToday(boardsData);
-      if (!todaysPuzzle) {
-        throw new Error(`No puzzle found for today (${getTodayPuzzleDateString()}).`);
+      if (!puzzleToLoad) {
+        throw new Error("Could not find a puzzle to load.");
       }
 
-      applyPuzzle(todaysPuzzle);
+      applyPuzzle(puzzleToLoad);
     }
 
     async function loadDictionary() {
@@ -717,13 +669,58 @@
       }
     }
 
-    function shuffleArray(array) {
-      const copy = [...array];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
+    function getSolutionPlacements() {
+      const placements = [];
+
+      for (let row = 0; row < boardHeight; row++) {
+        for (let col = 0; col < boardWidth; col++) {
+          const letter = solvedBoard[row]?.[col];
+          if (letter && letter !== "·") {
+            placements.push({ row, col, letter });
+          }
+        }
       }
-      return copy;
+
+      return placements;
+    }
+
+    function getHintQueue() {
+      return getSolutionPlacements().sort((a, b) => {
+        const diff = getRevealPriority(b) - getRevealPriority(a);
+        if (diff !== 0) return diff;
+
+        const baseDiff = (letterPoints[b.letter] ?? 0) - (letterPoints[a.letter] ?? 0);
+        if (baseDiff !== 0) return baseDiff;
+
+        if (a.row !== b.row) return a.row - b.row;
+        return a.col - b.col;
+      });
+    }
+
+    function isSolutionCell(row, col) {
+      return solvedBoard[row]?.[col] !== "·";
+    }
+
+    function toggleShadow() {
+      shadowEnabled = shadowToggle.checked;
+      render();
+    }
+
+    function getRevealPriority(entry) {
+      const base = letterPoints[entry.letter] ?? 0;
+      const modifier = getModifierAt(entry.row, entry.col);
+
+      let letterMultiplier = 1;
+      let wordMultiplier = 1;
+
+      if (modifier && modifier.endsWith("L")) {
+        letterMultiplier = Number(modifier[0]);
+      }
+      if (modifier && modifier.endsWith("W")) {
+        wordMultiplier = Number(modifier[0]);
+      }
+
+      return base * letterMultiplier * wordMultiplier;
     }
 
     function findTileLocation(tileId) {
@@ -769,7 +766,6 @@
 
     function getTileModifierText(boardIndex) {
       if (boardIndex === null) return "";
-
       const row = Math.floor(boardIndex / boardWidth);
       const col = boardIndex % boardWidth;
       return getModifierAt(row, col) ?? "";
@@ -804,6 +800,7 @@
       }
 
       let targetTile = null;
+
       if (targetArea === "rack") {
         targetTile = rack[targetIndex];
         rack[targetIndex] = movingTile;
@@ -1105,22 +1102,6 @@
       checkModalBackdrop.classList.remove("open");
     }
 
-    function isSolvedBoard() {
-      for (let row = 0; row < boardHeight; row++) {
-        for (let col = 0; col < boardWidth; col++) {
-          const expected = solvedBoard[row][col];
-          const actual = getBoardLetter(row, col);
-
-          if (expected === "·") {
-            if (actual !== null) return false;
-          } else {
-            if (actual !== expected) return false;
-          }
-        }
-      }
-      return true;
-    }
-
     function launchConfetti() {
       confettiContainer.innerHTML = "";
 
@@ -1144,6 +1125,8 @@
     }
 
     function getNextUnrevealedHint() {
+      const hintQueue = getHintQueue();
+
       while (revealedHintCount < hintQueue.length) {
         const nextHint = hintQueue[revealedHintCount];
         const currentTile = board[nextHint.row * boardWidth + nextHint.col];
@@ -1200,7 +1183,7 @@
       render();
     }
 
-       function checkBoardWords() {
+    function checkBoardWords() {
       if (!dictionaryLoaded) {
         alert("Dictionary is still loading.");
         return;
@@ -1239,7 +1222,7 @@
         hasWords
       });
     }
-    
+
     function isTouchDevice() {
       return "ontouchstart" in window || navigator.maxTouchPoints > 0;
     }
@@ -1484,7 +1467,7 @@
       }
 
       if (hintBtn) {
-        hintBtn.disabled = revealedHintCount >= hintQueue.length;
+        hintBtn.disabled = revealedHintCount >= getHintQueue().length;
       }
 
       shadowToggle.checked = shadowEnabled;
