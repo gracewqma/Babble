@@ -151,5 +151,23 @@
       "5-3": "3W"
     },
     "hint": "head"
+  }.
+      {
+    "date": "2026-04-10",
+    "title": "Sentences",
+    "solution": [
+      "S·P·C",
+      "U·L·R",
+      "GLAZE",
+      "A·I·A",
+      "R·N·M"
+    ],
+    "modifiers": {
+      "0-4": "2L",
+      "2-0": "3W",
+      "2-3": "3L",
+      "3-4": "2W"
+    }
+    "hint": "gla"
   }
 ]
